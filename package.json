@@ -46,6 +46,6 @@
     "pre-commit": "^1.1.2"
   },
   "optionalDependencies": {
-    "kerberos": "^0.0.19"
+    "kerberos": "^0.0.20"
   }
 }
