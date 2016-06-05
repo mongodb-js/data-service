@@ -16,6 +16,22 @@ describe('DataService', function() {
     service.connect(done);
   });
 
+  describe('#deleteOne', function() {
+    it('deletes the document from the collection', function(done) {
+      service.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+        assert.equal(null, err);
+        service.deleteOne('data-service.test', { a: 500 }, {}, function(er) {
+          assert.equal(null, er);
+          service.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+            assert.equal(null, error);
+            expect(docs.length).to.equal(0);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('#find', function() {
     before(function(done) {
       helper.insertTestDocuments(service.client, function() {

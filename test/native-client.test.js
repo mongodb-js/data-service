@@ -180,6 +180,22 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('#deleteOne', function() {
+    it('deletes the document from the collection', function(done) {
+      client.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+        assert.equal(null, err);
+        client.deleteOne('data-service.test', { a: 500 }, {}, function(er) {
+          assert.equal(null, er);
+          client.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+            assert.equal(null, error);
+            expect(docs.length).to.equal(0);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('#disconnect', function() {
     after(function(done) {
       client.connect(done);
