@@ -205,4 +205,26 @@ describe('DataService', function() {
       });
     });
   });
+
+  describe('#updateOne', function() {
+    after(function(done) {
+      helper.deleteTestDocuments(service.client, function() {
+        done();
+      });
+    });
+
+    it('updates the document', function(done) {
+      service.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+        assert.equal(null, err);
+        service.updateOne('data-service.test', { a: 500 }, { '$set': { a: 600 }}, {}, function(er) {
+          assert.equal(null, er);
+          service.find('data-service.test', { a: 600 }, {}, function(error, docs) {
+            assert.equal(null, error);
+            expect(docs.length).to.equal(1);
+            done();
+          });
+        });
+      });
+    });
+  });
 });
