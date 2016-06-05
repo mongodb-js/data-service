@@ -216,6 +216,25 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('#insertOne', function() {
+    after(function(done) {
+      helper.deleteTestDocuments(client, function() {
+        done();
+      });
+    });
+
+    it('inserts the document into the collection', function(done) {
+      client.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+        assert.equal(null, err);
+        client.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+          assert.equal(null, error);
+          expect(docs.length).to.equal(1);
+          done();
+        });
+      });
+    });
+  });
+
   describe('#sample', function() {
     before(function(done) {
       helper.insertTestDocuments(client, function() {

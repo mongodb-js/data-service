@@ -158,6 +158,25 @@ describe('DataService', function() {
     });
   });
 
+  describe('#insertOne', function() {
+    after(function(done) {
+      helper.deleteTestDocuments(service.client, function() {
+        done();
+      });
+    });
+
+    it('inserts the document into the collection', function(done) {
+      service.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+        assert.equal(null, err);
+        service.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+          assert.equal(null, error);
+          expect(docs.length).to.equal(1);
+          done();
+        });
+      });
+    });
+  });
+
   describe('#sample', function() {
     before(function(done) {
       helper.insertTestDocuments(service.client, function() {
