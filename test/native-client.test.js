@@ -129,6 +129,17 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('#currentOp', function() {
+    it('returns an object with the currentOp', function(done) {
+      client.currentOp(true, function(err, result) {
+        assert.equal(null, err);
+        console.log("RESULT!!!", JSON.stringify(result));
+        // expect(result.ok).to.equal(1);
+        done();
+      });
+    });
+  });
+
   describe('#databaseDetail', function() {
     it('returns the database details', function(done) {
       client.databaseDetail('data-service', function(err, database) {
