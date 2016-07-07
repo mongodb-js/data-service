@@ -133,7 +133,29 @@ describe('NativeClient', function() {
     it('returns an object with the currentOp', function(done) {
       client.currentOp(true, function(err, result) {
         assert.equal(null, err);
-        console.log("RESULT!!!", JSON.stringify(result));
+        console.log('CURRENTOP RESULT!!!', JSON.stringify(result));
+        // expect(result.ok).to.equal(1);
+        done();
+      });
+    });
+  });
+
+  describe('#serverStats', function() {
+    it('returns an object with the serverStats', function(done) {
+      client.serverStats(function(err, result) {
+        assert.equal(null, err);
+        console.log('SERVER STATS RESULT!!!', JSON.stringify(result));
+        // expect(result.ok).to.equal(1);
+        done();
+      });
+    });
+  });
+
+  describe('#top', function() {
+    it('returns an object with the results from top', function(done) {
+      client.top(function(err, result) {
+        assert.equal(null, err);
+        console.log('TOP RESULT!!!', JSON.stringify(result));
         // expect(result.ok).to.equal(1);
         done();
       });
