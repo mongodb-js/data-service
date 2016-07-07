@@ -133,7 +133,7 @@ describe('NativeClient', function() {
     it('returns an object with the currentOp', function(done) {
       client.currentOp(true, function(err, result) {
         assert.equal(null, err);
-        expect(result.inprog).to.not.equal(undefined); // TODO: do we need to actually test results?
+        expect(result.inprog).to.not.equal(undefined); // TODO: are these tests enough?
         done();
       });
     });
