@@ -35,7 +35,7 @@
     "mongodb-js-errors": "^0.2.1",
     "mongodb-ns": "^1.0.3",
     "mongodb-url": "^1.0.2",
-    "tunnel-ssh": "^2.1.1"
+    "tunnel-ssh": "^4.0.0"
   },
   "devDependencies": {
     "chai": "^3.4.1",
