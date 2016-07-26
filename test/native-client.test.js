@@ -28,7 +28,8 @@ describe('NativeClient', function() {
       var badConnection =
         new Connection({ hostname: '127.0.0.1', port: 27050, ns: 'data-service' });
       var badClient = new NativeClient(badConnection);
-      var message = 'MongoDB not running on the provided host and port';
+      // var message = 'MongoDB not running on the provided host and port';
+      var message = 'Could not connect to MongoDB on the provided host and port';
       it('maps the error message', function(done) {
         badClient.connect(function(error) {
           expect(error.message).to.equal(message);
@@ -262,7 +263,7 @@ describe('NativeClient', function() {
             { returnOriginal: false },
             function(error, result) {
               expect(error).to.equal(null);
-              expect(result._id).to.deep.equal(id);
+              expect(result._id.toString()).to.deep.equal(id.toString());
               expect(result.b).to.equal(5);
               expect(result.hasOwnProperty('a')).to.equal(false);
               done();

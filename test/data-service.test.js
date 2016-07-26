@@ -90,7 +90,7 @@ describe('DataService', function() {
           { returnOriginal: false },
           function(error, result) {
             expect(error).to.equal(null);
-            expect(result._id).to.deep.equal(id);
+            expect(result._id.toString()).to.deep.equal(id.toString());
             expect(result.b).to.equal(5);
             expect(result.hasOwnProperty('a')).to.equal(false);
             done();
