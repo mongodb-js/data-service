@@ -25,8 +25,11 @@ describe('NativeClient', function() {
 
   describe('#connect', function() {
     context('when an invalid connection was provided', function() {
-      var badConnection =
-        new Connection({ hostname: '127.0.0.1', port: 27050, ns: 'data-service' });
+      var badConnection = new Connection({
+        hostname: '127.0.0.1',
+        port: 27050,
+        ns: 'data-service'
+      });
       var badClient = new NativeClient(badConnection);
       // var message = 'MongoDB not running on the provided host and port';
       var message = 'Could not connect to MongoDB on the provided host and port';
@@ -60,7 +63,9 @@ describe('NativeClient', function() {
 
     context('when a filter is provided', function() {
       it('returns a cursor for the matching documents', function(done) {
-        client.find('data-service.test', { a: 1 }, {}, function(error, docs) {
+        client.find('data-service.test', {
+          a: 1
+        }, {}, function(error, docs) {
           assert.equal(null, error);
           expect(docs.length).to.equal(1);
           done();
@@ -80,7 +85,9 @@ describe('NativeClient', function() {
 
     context('when options are provided', function() {
       it('returns a cursor for the documents', function(done) {
-        client.find('data-service.test', {}, { skip: 1 }, function(error, docs) {
+        client.find('data-service.test', {}, {
+          skip: 1
+        }, function(error, docs) {
           assert.equal(null, error);
           expect(docs.length).to.equal(1);
           done();
@@ -190,7 +197,9 @@ describe('NativeClient', function() {
   describe('#count', function() {
     context('when a filter is provided', function() {
       it('returns a count for the matching documents', function(done) {
-        client.count('data-service.test', { a: 1 }, {}, function(error, count) {
+        client.count('data-service.test', {
+          a: 1
+        }, {}, function(error, count) {
           assert.equal(null, error);
           expect(count).to.equal(0);
           done();
@@ -202,7 +211,9 @@ describe('NativeClient', function() {
   describe('#explain', function() {
     context('when a filter is provided', function() {
       it('returns an explain object for the provided filter', function(done) {
-        client.explain('data-service.test', { a: 1 }, {}, function(error, explanation) {
+        client.explain('data-service.test', {
+          a: 1
+        }, {}, function(error, explanation) {
           assert.equal(null, error);
           expect(explanation).to.be.an('object');
           done();
@@ -213,11 +224,17 @@ describe('NativeClient', function() {
 
   describe('#deleteOne', function() {
     it('deletes the document from the collection', function(done) {
-      client.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+      client.insertOne('data-service.test', {
+        a: 500
+      }, {}, function(err) {
         assert.equal(null, err);
-        client.deleteOne('data-service.test', { a: 500 }, {}, function(er) {
+        client.deleteOne('data-service.test', {
+          a: 500
+        }, {}, function(er) {
           assert.equal(null, er);
-          client.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+          client.find('data-service.test', {
+            a: 500
+          }, {}, function(error, docs) {
             assert.equal(null, error);
             expect(docs.length).to.equal(0);
             done();
@@ -229,11 +246,19 @@ describe('NativeClient', function() {
 
   describe('#deleteMany', function() {
     it('deletes the documents from the collection', function(done) {
-      client.insertMany('data-service.test', [{ a: 500 }, { a: 500 }], {}, function(err) {
+      client.insertMany('data-service.test', [{
+        a: 500
+      }, {
+        a: 500
+      }], {}, function(err) {
         assert.equal(null, err);
-        client.deleteMany('data-service.test', { a: 500 }, {}, function(er) {
+        client.deleteMany('data-service.test', {
+          a: 500
+        }, {}, function(er) {
           assert.equal(null, er);
-          client.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+          client.find('data-service.test', {
+            a: 500
+          }, {}, function(error, docs) {
             assert.equal(null, error);
             expect(docs.length).to.equal(0);
             done();
@@ -254,14 +279,22 @@ describe('NativeClient', function() {
       var id = new ObjectId();
 
       it('returns the updated document', function(done) {
-        client.insertOne('data-service.test', { _id: id, a: 500 }, {}, function(err) {
+        client.insertOne('data-service.test', {
+          _id: id,
+          a: 500
+        }, {}, function(err) {
           assert.equal(null, err);
           client.findOneAndReplace(
             'data-service.test',
-            { _id: id },
-            { b: 5 },
-            { returnOriginal: false },
-            function(error, result) {
+            {
+              _id: id
+            },
+            {
+              b: 5
+            },
+            {
+              returnOriginal: false
+            }, function(error, result) {
               expect(error).to.equal(null);
               expect(result._id.toString()).to.deep.equal(id.toString());
               expect(result.b).to.equal(5);
@@ -277,14 +310,22 @@ describe('NativeClient', function() {
       var id = new ObjectId();
 
       it('returns the updated document', function(done) {
-        client.insertOne('data-service.test', { _id: id, a: 500 }, {}, function(err) {
+        client.insertOne('data-service.test', {
+          _id: id,
+          a: 500
+        }, {}, function(err) {
           assert.equal(null, err);
           client.findOneAndReplace(
             'data-service.test',
-            { _id: id },
-            { '$b': 5 },
-            { returnOriginal: false },
-            function(error) {
+            {
+              _id: id
+            },
+            {
+              $b: 5
+            },
+            {
+              returnOriginal: false
+            }, function(error) {
               expect(error.message).to.not.equal(null);
               done();
             }
@@ -338,9 +379,13 @@ describe('NativeClient', function() {
     });
 
     it('inserts the document into the collection', function(done) {
-      client.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+      client.insertOne('data-service.test', {
+        a: 500
+      }, {}, function(err) {
         assert.equal(null, err);
-        client.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+        client.find('data-service.test', {
+          a: 500
+        }, {}, function(error, docs) {
           assert.equal(null, error);
           expect(docs.length).to.equal(1);
           done();
@@ -357,9 +402,15 @@ describe('NativeClient', function() {
     });
 
     it('inserts the documents into the collection', function(done) {
-      client.insertMany('data-service.test', [{ a: 500 }, { a: 500 }], {}, function(err) {
+      client.insertMany('data-service.test', [{
+        a: 500
+      }, {
+        a: 500
+      }], {}, function(err) {
         assert.equal(null, err);
-        client.find('data-service.test', { a: 500 }, {}, function(error, docs) {
+        client.find('data-service.test', {
+          a: 500
+        }, {}, function(error, docs) {
           assert.equal(null, error);
           expect(docs.length).to.equal(2);
           done();
@@ -419,11 +470,21 @@ describe('NativeClient', function() {
     });
 
     it('updates the document', function(done) {
-      client.insertOne('data-service.test', { a: 500 }, {}, function(err) {
+      client.insertOne('data-service.test', {
+        a: 500
+      }, {}, function(err) {
         assert.equal(null, err);
-        client.updateOne('data-service.test', { a: 500 }, { '$set': { a: 600 }}, {}, function(er) {
+        client.updateOne('data-service.test', {
+          a: 500
+        }, {
+          $set: {
+            a: 600
+          }
+        }, {}, function(er) {
           assert.equal(null, er);
-          client.find('data-service.test', { a: 600 }, {}, function(error, docs) {
+          client.find('data-service.test', {
+            a: 600
+          }, {}, function(error, docs) {
             assert.equal(null, error);
             expect(docs.length).to.equal(1);
             done();
@@ -441,11 +502,23 @@ describe('NativeClient', function() {
     });
 
     it('updates the documents', function(done) {
-      client.insertMany('data-service.test', [{ a: 500 }, { a: 500 }], {}, function(err) {
+      client.insertMany('data-service.test', [{
+        a: 500
+      }, {
+        a: 500
+      }], {}, function(err) {
         assert.equal(null, err);
-        client.updateMany('data-service.test', { a: 500 }, { '$set': { a: 600 }}, {}, function(er) {
+        client.updateMany('data-service.test', {
+          a: 500
+        }, {
+          $set: {
+            a: 600
+          }
+        }, {}, function(er) {
           assert.equal(null, er);
-          client.find('data-service.test', { a: 600 }, {}, function(error, docs) {
+          client.find('data-service.test', {
+            a: 600
+          }, {}, function(error, docs) {
             assert.equal(null, error);
             expect(docs.length).to.equal(2);
             done();
