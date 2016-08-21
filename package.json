@@ -24,7 +24,7 @@
   ],
   "dependencies": {
     "async": "^1.5.2",
-    "bson": "^0.4.22",
+    "bson": "^0.5.3",
     "debug": "^2.2.0",
     "lodash": "^4.6.1",
     "mongodb": "^2.1.10",
