@@ -504,13 +504,25 @@ describe('NativeClient', function() {
   });
 
   describe('#indexes', function() {
-    it('returns the indexes', function(done) {
-      client.indexes('data-service.test', function(err, indexes) {
-        assert.equal(null, err);
-        expect(indexes[0].name).to.equal('_id_');
-        done();
+    if (process.env.MONGODB_VERSION >= '3.2.0') {
+      it('returns the indexes when $indexStats can run', function(done) {
+        client.indexes('data-service.test', function(err, indexes) {
+          assert.equal(null, err);
+          expect(indexes[0].name).to.equal('_id_');
+          expect(indexes[0]).to.include.keys('usageHost', 'usageCount', 'usageSince');
+          done();
+        });
       });
-    });
+    } else {
+      it('returns nothing when $indexStats cannot run', function(done) {
+        client.indexes('data-service.test', function(err, indexes) {
+          assert.equal(null, err);
+          expect(indexes[0].name).to.equal('_id_');
+          expect(indexes[0]).to.not.include.keys('usageHost', 'usageCount', 'usageSince');
+          done();
+        });
+      });
+    }
   });
 
   describe('#instance', function() {
