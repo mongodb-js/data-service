@@ -141,10 +141,8 @@ describe('NativeClient', function() {
 
     context('when readonly views exist', function() {
       after(function(done) {
-        client.dropCollection('data-service.readonlyfoo', function(error) {
-          assert.equal(null, error);
-          client.dropCollection('data-service.system.views', function(err) {
-            assert.equal(null, err);
+        client.dropCollection('data-service.readonlyfoo', function() {
+          client.dropCollection('data-service.system.views', function() {
             done();
           });
         });
