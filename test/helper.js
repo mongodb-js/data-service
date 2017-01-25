@@ -9,6 +9,11 @@ module.exports.assert = assert;
 module.exports.expect = expect;
 module.exports.eventStream = es;
 
+
+if (process.env.MONGODB_URL) {
+  console.log('Got MONGODB_URL in env');
+}
+
 module.exports.connection = new Connection({
   hostname: '127.0.0.1',
   port: 27018,
