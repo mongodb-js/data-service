@@ -94,9 +94,10 @@ describe('DataService', function() {
     });
 
     it('removes an index from a collection', function(done) {
-      service.dropIndex('data-service.test', 'a_1', function(error) {
+      const namespace = 'data-service.test';
+      service.dropIndex(namespace, 'a_1', function(error) {
         assert.equal(null, error);
-        helper.indexes(service.client, function(err, indexes) {
+        service.indexes(namespace, {}, function(err, indexes) {
           assert.equal(null, err);
           expect(indexes).to.not.have.property({name: 'a_1'});
           done();
@@ -356,11 +357,12 @@ describe('DataService', function() {
 
     context('when options are provided', function() {
       it('creates a new index with the provided options', function(done) {
+        const namespace = 'data-service.test';
         var spec = {a: 1};
         var options = {unique: true};
-        service.createIndex('data-service.test', spec, options, function(error) {
+        service.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
-          helper.indexes(service.client, function(err, indexes) {
+          service.indexes(namespace, {}, function(err, indexes) {
             assert.equal(null, err);
             expect(indexes.length).to.equal(2);
             done();
@@ -371,11 +373,12 @@ describe('DataService', function() {
 
     context('when no options are provided', function() {
       it('creates a new single index', function(done) {
+        const namespace = 'data-service.test';
         var spec = {b: 1};
         var options = {};
-        service.createIndex('data-service.test', spec, options, function(error) {
+        service.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
-          helper.indexes(service.client, function(err, indexes) {
+          service.indexes(namespace, {}, function(err, indexes) {
             assert.equal(null, err);
             expect(indexes.length).to.equal(3);
             done();
@@ -384,11 +387,12 @@ describe('DataService', function() {
       });
 
       it('creates a new compound index', function(done) {
+        const namespace = 'data-service.test';
         var spec = {a: -1, b: 1};
         var options = {};
-        service.createIndex('data-service.test', spec, options, function(error) {
+        service.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
-          helper.indexes(service.client, function(err, indexes) {
+          service.indexes(namespace, {}, function(err, indexes) {
             assert.equal(null, err);
             expect(indexes.length).to.equal(4);
             done();

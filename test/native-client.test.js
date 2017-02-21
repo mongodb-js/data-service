@@ -505,11 +505,12 @@ describe('NativeClient', function() {
 
     context('when options are provided', function() {
       it('creates a new index with the provided options', function(done) {
+        const namespace = 'data-service.test';
         var spec = {a: 1};
         var options = {unique: true};
-        client.createIndex('data-service.test', spec, options, function(error) {
+        client.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
-          helper.indexes(client, function(err, indexes) {
+          client.indexes(namespace, function(err, indexes) {
             assert.equal(null, err);
             expect(indexes.length).to.equal(2);
             done();
@@ -520,11 +521,12 @@ describe('NativeClient', function() {
 
     context('when no options are provided', function() {
       it('creates a new single index', function(done) {
+        const namespace = 'data-service.test';
         var spec = {b: 1};
         var options = {};
-        client.createIndex('data-service.test', spec, options, function(error) {
+        client.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
-          helper.indexes(client, function(err, indexes) {
+          client.indexes(namespace, function(err, indexes) {
             assert.equal(null, err);
             expect(indexes.length).to.equal(3);
             done();
@@ -533,11 +535,12 @@ describe('NativeClient', function() {
       });
 
       it('creates a new compound index', function(done) {
+        const namespace = 'data-service.test';
         var spec = {a: -1, b: 1};
         var options = {};
-        client.createIndex('data-service.test', spec, options, function(error) {
+        client.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
-          helper.indexes(client, function(err, indexes) {
+          client.indexes(namespace, function(err, indexes) {
             assert.equal(null, err);
             expect(indexes.length).to.equal(4);
             done();
@@ -636,9 +639,10 @@ describe('NativeClient', function() {
     });
 
     it('removes an index from a collection', function(done) {
-      client.dropIndex('data-service.test', 'a_1', function(error) {
+      const namespace = 'data-service.test';
+      client.dropIndex(namespace, 'a_1', function(error) {
         assert.equal(null, error);
-        helper.indexes(client, function(err, indexes) {
+        client.indexes(namespace, function(err, indexes) {
           assert.equal(null, err);
           expect(indexes).to.not.have.property({name: 'a_1'});
           done();
