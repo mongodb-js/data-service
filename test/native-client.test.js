@@ -619,7 +619,7 @@ describe('NativeClient', function() {
     it('drops a database', function(done) {
       client.dropDatabase('mangoDB', function(error) {
         assert.equal(null, error);
-        helper.listDatabases(client, function(err, dbs) {
+        client.listDatabases(function(err, dbs) {
           assert.equal(null, err);
           expect(dbs).to.not.have.property({name: 'mangoDB'});
           done();
