@@ -1,11 +1,13 @@
-var helper = require('./helper');
+const semver = require('semver');
+const helper = require('./helper');
 
-var assert = helper.assert;
-var expect = helper.expect;
-var eventStream = helper.eventStream;
-var ObjectId = require('bson').ObjectId;
+const assert = helper.assert;
+const expect = helper.expect;
+const eventStream = helper.eventStream;
+const ObjectId = require('bson').ObjectId;
 
-var DataService = require('../lib/data-service');
+const DataService = require('../lib/data-service');
+const _ = require('lodash');
 
 describe('DataService', function() {
   var service = new DataService(helper.connection);
@@ -238,14 +240,30 @@ describe('DataService', function() {
 
   describe('#listCollections', function() {
     it('returns the collections', function(done) {
-      service.listCollections('data-service', {}, function(err, collections) {
+      service.listCollections('data-service', {}, function(err, rawCollections) {
         assert.equal(null, err);
-        // For <3.2 system.indexes is returned with listCollections
-        expect(collections.length).to.equal(1);
-        expect(collections[0]).to.include.keys(['name', 'options']);
-        expect(collections[0].name).to.equal('test');
-        expect(collections[0].options).to.deep.equal({});
-        done();
+        const collections = rawCollections.map(collection => {
+          return _.pick(collection, ['info', 'name', 'options']);
+        });
+        service.client.database.admin().command({ buildInfo: 1 }, (error, info) => {
+          assert.equal(null, error);
+          if (semver.lt(info.version, '3.2.0')) {
+            // For <3.2 system.indexes is returned with listCollections
+            expect(collections).to.be.deep.equal([
+              {name: 'system.indexes', options: {}},
+              {name: 'test', options: {}}
+            ]);
+          } else if (semver.lt(info.version, '3.4.0')) {
+            expect(collections).to.be.deep.equal([
+              { name: 'test', options: {} }
+            ]);
+          } else {
+            expect(collections).to.be.deep.equal([
+              { info: {readOnly: false}, name: 'test', options: {} }
+            ]);
+          }
+          done();
+        });
       });
     });
   });
