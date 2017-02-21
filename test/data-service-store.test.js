@@ -251,6 +251,19 @@ describe('DataServiceStore', function() {
     });
   });
 
+  describe('#listDatabases', function() {
+    it('fires a list databases complete action', function(done) {
+      var unsubscribe = Actions.listDatabasesComplete.listen(function(error, result) {
+        expect(error).to.equal(null);
+        const databaseNames = result.map(db => db.name);
+        expect(databaseNames).to.deep.equal(['admin', 'data-service', 'local']);
+        unsubscribe();
+        done();
+      });
+      Actions.listDatabases();
+    });
+  });
+
   describe('#listIndexes', function() {
     it('fires a list indexes complete action', function(done) {
       var unsubscribe = Actions.listIndexesComplete.listen(function(error, result) {
