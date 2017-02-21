@@ -466,10 +466,11 @@ describe('NativeClient', function() {
     });
 
     it('creates a new collection', function(done) {
+      const dbName = 'data-service';
       var options = {};
-      client.createCollection('data-service.foo', options, function(error) {
+      client.createCollection(`${dbName}.foo`, options, function(error) {
         assert.equal(null, error);
-        helper.listCollections(client, function(err, items) {
+        client.listCollections(dbName, {}, function(err, items) {
           assert.equal(null, err);
           // For <3.2 system.indexes is returned with listCollections
           expect(items.length).to.equal(2);
@@ -591,9 +592,10 @@ describe('NativeClient', function() {
     });
 
     it('drops a collection', function(done) {
-      client.dropCollection('data-service.bar', function(error) {
+      const dbName = 'data-service';
+      client.dropCollection(`${dbName}.bar`, function(error) {
         assert.equal(null, error);
-        helper.listCollections(client, function(err, items) {
+        client.listCollections(dbName, {}, function(err, items) {
           assert.equal(null, err);
           expect(items).to.not.include({name: 'bar', options: {}});
           done();

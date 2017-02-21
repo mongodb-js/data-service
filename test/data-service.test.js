@@ -50,9 +50,10 @@ describe('DataService', function() {
     });
 
     it('drops a collection', function(done) {
-      service.dropCollection('data-service.bar', function(error) {
+      const dbName = 'data-service';
+      service.dropCollection(`${dbName}.bar`, function(error) {
         assert.equal(null, error);
-        helper.listCollections(service.client, function(err, items) {
+        service.listCollections(dbName, {}, function(err, items) {
           assert.equal(null, err);
           expect(items).to.not.include({name: 'bar', options: {}});
           done();
@@ -320,7 +321,7 @@ describe('DataService', function() {
       var options = {};
       service.createCollection('data-service.foo', options, function(error) {
         assert.equal(null, error);
-        helper.listCollections(service.client, function(err, items) {
+        service.listCollections('data-service', {}, function(err, items) {
           assert.equal(null, err);
           // For <3.2 system.indexes is returned with listCollections
           expect(items.length).to.equal(2);
