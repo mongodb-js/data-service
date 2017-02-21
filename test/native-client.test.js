@@ -1,13 +1,15 @@
-var helper = require('./helper');
+const helper = require('./helper');
 
-var assert = helper.assert;
-var expect = helper.expect;
-var eventStream = helper.eventStream;
-var Connection = require('mongodb-connection-model');
-var ObjectId = require('bson').ObjectId;
-var mock = require('mock-require');
+const assert = helper.assert;
+const expect = helper.expect;
+const eventStream = helper.eventStream;
+const Connection = require('mongodb-connection-model');
+const ObjectId = require('bson').ObjectId;
+const mock = require('mock-require');
+const semver = require('semver');
 
-var NativeClient = require('../lib/native-client');
+const NativeClient = require('../lib/native-client');
+const _ = require('lodash');
 
 describe('NativeClient', function() {
   var client = new NativeClient(helper.connection);
@@ -472,20 +474,31 @@ describe('NativeClient', function() {
         assert.equal(null, error);
         client.listCollections(dbName, {}, function(err, items) {
           assert.equal(null, err);
-          // For <3.2 system.indexes is returned with listCollections
-          expect(items.length).to.equal(2);
-          expect(items[0]).to.include.keys(['name', 'options']);
-          expect(items[1]).to.include.keys(['name', 'options']);
-          expect(items[0].options).to.deep.equal({});
-          expect(items[1].options).to.deep.equal({});
-          if (items[0].name === 'foo') {
-            expect(items[1].name).to.equal('test');
-          } else if (items[0].name === 'test') {
-            expect(items[1].name).to.equal('foo');
-          } else {
-            assert(false, 'Collection returned from listCollections has incorrect name');
-          }
-          done();
+          const collections = items.map(collection => {
+            return _.pick(collection, ['info', 'name', 'options']);
+          }).sort();
+          client.database.admin().command({ buildInfo: 1 }, (buildError, info) => {
+            assert.equal(null, buildError);
+            if (semver.lt(info.version, '3.2.0')) {
+              // For <3.2 system.indexes is returned with listCollections
+              expect(collections).to.be.deep.equal([
+                {name: 'foo', options: {}},
+                {name: 'system.indexes', options: {}},
+                {name: 'test', options: {}}
+              ]);
+            } else if (semver.lt(info.version, '3.4.0')) {
+              expect(collections).to.be.deep.equal([
+                { name: 'foo', options: {} },
+                { name: 'test', options: {} }
+              ]);
+            } else {
+              expect(collections).to.be.deep.equal([
+                { info: {readOnly: false}, name: 'foo', options: {} },
+                { info: {readOnly: false}, name: 'test', options: {} }
+              ]);
+            }
+            done();
+          });
         });
       });
     });
