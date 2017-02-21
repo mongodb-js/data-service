@@ -301,7 +301,8 @@ describe('DataService', function() {
       service.listDatabases(function(err, databases) {
         assert.equal(null, err);
         const databaseNames = databases.map(db => db.name);
-        expect(databaseNames).to.deep.equal(['admin', 'data-service', 'local']);
+        expect(databaseNames).to.contain('data-service');
+        expect(databaseNames).to.contain('local');
         expect(databases[0]).to.include.keys(['name', 'sizeOnDisk', 'empty']);
         done();
       });
