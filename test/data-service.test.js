@@ -296,6 +296,18 @@ describe('DataService', function() {
     });
   });
 
+  describe('#listDatabases', function() {
+    it('returns the databases', function(done) {
+      service.listDatabases(function(err, databases) {
+        assert.equal(null, err);
+        const databaseNames = databases.map(db => db.name);
+        expect(databaseNames).to.deep.equal(['admin', 'data-service', 'local']);
+        expect(databases[0]).to.include.keys(['name', 'sizeOnDisk', 'empty']);
+        done();
+      });
+    });
+  });
+
   describe('#disconnect', function() {
     after(function(done) {
       service.connect(done);
