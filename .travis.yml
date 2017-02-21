@@ -16,3 +16,6 @@ env:
   - MONGODB_VERSION=3.2.x MONGODB_TOPOLOGY=standalone
   - MONGODB_VERSION=3.4.x MONGODB_TOPOLOGY=standalone
   - MONGODB_VERSION=3.5.x MONGODB_TOPOLOGY=standalone
+matrix:
+  allow_failures:
+    - env: MONGODB_VERSION=3.5.x MONGODB_TOPOLOGY=standalone
