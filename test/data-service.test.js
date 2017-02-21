@@ -244,7 +244,7 @@ describe('DataService', function() {
         assert.equal(null, err);
         const collections = rawCollections.map(collection => {
           return _.pick(collection, ['info', 'name', 'options']);
-        });
+        }).sort();
         service.client.database.admin().command({ buildInfo: 1 }, (error, info) => {
           assert.equal(null, error);
           if (semver.lt(info.version, '3.2.0')) {
