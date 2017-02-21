@@ -74,7 +74,7 @@ describe('DataService', function() {
     it('drops a database', function(done) {
       service.dropDatabase('mangoDB', function(error) {
         assert.equal(null, error);
-        helper.listDatabases(service.client, function(err, dbs) {
+        service.listDatabases(function(err, dbs) {
           assert.equal(null, err);
           expect(dbs).to.not.have.property({name: 'mangoDB'});
           done();
