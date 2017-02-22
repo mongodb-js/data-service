@@ -65,6 +65,18 @@ describe('DataServiceStore', function() {
     });
   });
 
+  describe('#usersInfo', function() {
+    it('fires a usersInfo complete action', function(done) {
+      var unsubscribe = Actions.usersInfoComplete.listen(function(error, result) {
+        expect(error).to.equal(null);
+        expect(result).to.be.deep.equal({ users: [], ok: 1 });
+        unsubscribe();
+        done();
+      });
+      Actions.usersInfo('dba-user');
+    });
+  });
+
   describe('#count', function() {
     it('fires a count complete action', function(done) {
       var unsubscribe = Actions.countComplete.listen(function(error, result) {

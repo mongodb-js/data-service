@@ -21,7 +21,12 @@ describe('NativeClient', function() {
   }));
 
   before(function(done) {
-    client.connect(done);
+    const callback = (err, result) => {
+      const adminDb = client.database.admin();
+      adminDb.addUser('dba-admin', 'password', { roles: ['root'] });
+      done(err, result);
+    };
+    client.connect(callback);
   });
 
   describe('#connect', function() {
@@ -281,6 +286,182 @@ describe('NativeClient', function() {
           'system'
         ]);
         done();
+      });
+    });
+  });
+
+  describe('#usersInfo', function() {
+    context('with existing users', function() {
+      before(function(done) {
+        const adminDb = client.database.admin();
+        adminDb.authenticate('dba-admin', 'password', () => {
+          adminDb.addUser('dba-user1', 'password', {
+            roles: [
+              {role: 'clusterAdmin', db: 'admin'},
+              {role: 'readWrite', db: 'candy'}
+            ]
+          });
+          adminDb.addUser('dba-user2', 'password', {
+            roles: [
+              {role: 'read', db: 'bar'}
+            ]
+          });
+          done();
+        });
+      });
+
+      // There are at least two main permutations of usersInfo we should support
+      // https://docs.mongodb.com/manual/reference/command/usersInfo/
+      it('fetches for a single user with no credentials and with privileges', function(done) {
+        const options = {
+          usersInfo: 'dba-user2',
+          showPrivileges: true
+        };
+        client.usersInfo(options, function(error, result) {
+          assert.equal(null, error);
+          expect(result.users).to.be.deep.equal([
+            {
+              '_id': 'admin.dba-user2',
+              'customData': {},
+              'db': 'admin',
+              'inheritedPrivileges': [
+                {
+                  'actions': [
+                    'collStats',
+                    'dbHash',
+                    'dbStats',
+                    'find',
+                    'killCursors',
+                    'listCollections',
+                    'listIndexes',
+                    'planCacheRead'
+                  ],
+                  'resource': {
+                    'collection': '',
+                    'db': 'bar'
+                  }
+                },
+                {
+                  'actions': [
+                    'collStats',
+                    'dbHash',
+                    'dbStats',
+                    'find',
+                    'killCursors',
+                    'listCollections',
+                    'listIndexes',
+                    'planCacheRead'
+                  ],
+                  'resource': {
+                    'collection': 'system.indexes',
+                    'db': 'bar'
+                  }
+                },
+                {
+                  'actions': [
+                    'collStats',
+                    'dbHash',
+                    'dbStats',
+                    'find',
+                    'killCursors',
+                    'listCollections',
+                    'listIndexes',
+                    'planCacheRead'
+                  ],
+                  'resource': {
+                    'collection': 'system.js',
+                    'db': 'bar'
+                  }
+                },
+                {
+                  'actions': [
+                    'collStats',
+                    'dbHash',
+                    'dbStats',
+                    'find',
+                    'killCursors',
+                    'listCollections',
+                    'listIndexes',
+                    'planCacheRead'
+                  ],
+                  'resource': {
+                    'collection': 'system.namespaces',
+                    'db': 'bar'
+                  }
+                }
+              ],
+              'inheritedRoles': [
+                {
+                  'db': 'bar',
+                  'role': 'read'
+                }
+              ],
+              'roles': [
+                {
+                  'db': 'bar',
+                  'role': 'read'
+                }
+              ],
+              'user': 'dba-user2'
+            }
+          ]);
+          done();
+        });
+      });
+      it('fetches for all users', function(done) {
+        client.usersInfo({usersInfo: 1}, function(error, result) {
+          assert.equal(null, error);
+          expect(result.users).to.be.deep.equal([
+            {
+              '_id': 'admin.dba-admin',
+              'customData': {},
+              'db': 'admin',
+              'roles': [
+                {
+                  'db': 'admin',
+                  'role': 'root'
+                }
+              ],
+              'user': 'dba-admin'
+            },
+            {
+              '_id': 'admin.dba-user1',
+              'customData': {},
+              'db': 'admin',
+              'roles': [
+                {
+                  'db': 'admin',
+                  'role': 'clusterAdmin'
+                },
+                {
+                  'db': 'candy',
+                  'role': 'readWrite'
+                }
+              ],
+              'user': 'dba-user1'
+            },
+            {
+              '_id': 'admin.dba-user2',
+              'customData': {},
+              'db': 'admin',
+              'roles': [
+                {
+                  'db': 'bar',
+                  'role': 'read'
+                }
+              ],
+              'user': 'dba-user2'
+            }
+          ]);
+          done();
+        });
+      });
+      it('raises error if providing userInfo (non-plural typo)', function(done) {
+        client.usersInfo({userInfo: 1}, function(error, result) {
+          expect(error).to.match(/Unexpected keys found in usersInfo options: userInfo/);
+          assert.equal(null, result);
+          done();
+        });
       });
     });
   });
