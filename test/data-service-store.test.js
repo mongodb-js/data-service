@@ -1,9 +1,9 @@
-var helper = require('./helper');
+const helper = require('./helper');
 
-var expect = helper.expect;
+const expect = helper.expect;
 
-var Actions = require('../lib/actions');
-var Store = require('../lib/data-service-store');
+const Actions = require('../lib/actions');
+const Store = require('../lib/data-service-store');
 
 describe('DataServiceStore', function() {
   before(require('mongodb-runner/mocha/before')({
@@ -30,6 +30,18 @@ describe('DataServiceStore', function() {
         done();
       });
       Actions.aggregate('data-service.test', [], {});
+    });
+  });
+
+  describe('#buildInfo', function() {
+    it('fires a buildInfo complete action', function(done) {
+      var unsubscribe = Actions.buildInfoComplete.listen(function(error, result) {
+        expect(error).to.equal(null);
+        expect(Object.keys(result)).to.contain('version');  // e.g. 3.4.2
+        unsubscribe();
+        done();
+      });
+      Actions.buildInfo();
     });
   });
 

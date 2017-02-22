@@ -245,6 +245,31 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('#buildInfo', function() {
+    it('retrieves buildInfo', function(done) {
+      client.buildInfo(function(error, result) {
+        assert.equal(null, error);
+        expect(result).to.have.all.keys([
+          'allocator',
+          'bits',
+          'buildEnvironment',
+          'debug',
+          'gitVersion',
+          'javascriptEngine',
+          'maxBsonObjectSize',
+          'modules',
+          'ok',
+          'openssl',
+          'storageEngines',
+          'sysInfo',
+          'version',
+          'versionArray'
+        ]);
+        done();
+      });
+    });
+  });
+
   describe('#find', function() {
     before(function(done) {
       helper.insertTestDocuments(client, function() {
