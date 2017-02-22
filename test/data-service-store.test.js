@@ -45,6 +45,26 @@ describe('DataServiceStore', function() {
     });
   });
 
+  describe('#hostInfo', function() {
+    it('fires a hostInfo complete action', function(done) {
+      var unsubscribe = Actions.hostInfoComplete.listen(function(error, result) {
+        expect(error).to.equal(null);
+        expect(result.system).to.have.all.keys([
+          'currentTime', // 2017-02-22T07:01:35.999Z,
+          'hostname',    // 'rocket.local:27018',
+          'cpuAddrSize', // 64,
+          'memSizeMB',   // 16384,
+          'numCores',    // 4,
+          'cpuArch',     // 'x86_64',
+          'numaEnabled'  // false },
+        ]);
+        unsubscribe();
+        done();
+      });
+      Actions.hostInfo();
+    });
+  });
+
   describe('#count', function() {
     it('fires a count complete action', function(done) {
       var unsubscribe = Actions.countComplete.listen(function(error, result) {

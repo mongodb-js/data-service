@@ -270,6 +270,21 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('#hostInfo', function() {
+    it('retrieves hostInfo', function(done) {
+      client.hostInfo(function(error, result) {
+        assert.equal(null, error);
+        expect(result).to.have.all.keys([
+          'extra',
+          'ok',
+          'os',
+          'system'
+        ]);
+        done();
+      });
+    });
+  });
+
   describe('#find', function() {
     before(function(done) {
       helper.insertTestDocuments(client, function() {
