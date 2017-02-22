@@ -65,6 +65,24 @@ describe('DataServiceStore', function() {
     });
   });
 
+  describe('#connectionStatus', function() {
+    it('fires a connectionStatus complete action', function(done) {
+      var unsubscribe = Actions.connectionStatusComplete.listen(function(error, result) {
+        expect(error).to.equal(null);
+        expect(result).to.be.deep.equal({
+          ok: 1,
+          authInfo: {
+            authenticatedUserRoles: [],
+            authenticatedUsers: []
+          }
+        });
+        unsubscribe();
+        done();
+      });
+      Actions.connectionStatus();
+    });
+  });
+
   describe('#usersInfo', function() {
     it('fires a usersInfo complete action', function(done) {
       var unsubscribe = Actions.usersInfoComplete.listen(function(error, result) {

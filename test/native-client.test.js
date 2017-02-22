@@ -290,6 +290,40 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('#connectionStatus', function() {
+    it('retrieves connectionStatus when logged out', function(done) {
+      client.connectionStatus(function(error, result) {
+        assert.equal(null, error);
+        expect(result).to.be.deep.equal({
+          ok: 1,
+          authInfo: {
+            authenticatedUserRoles: [],
+            authenticatedUsers: []
+          }
+        });
+        done();
+      });
+    });
+    it('retrieves connectionStatus when logged in', function(done) {
+      const adminDb = client.database.admin();
+      adminDb.authenticate('dba-admin', 'password', () => {
+        client.connectionStatus(function(error, result) {
+          assert.equal(null, error);
+          // Might be nice to get tests for authentication mechanisms
+          // like X.509 and Kerberos around here...
+          expect(result).to.be.deep.equal({
+            ok: 1,
+            authInfo: {
+              authenticatedUserRoles: [{ db: 'admin', role: 'root'}],
+              authenticatedUsers: [{db: 'admin', user: 'dba-admin'}]
+            }
+          });
+          done();
+        });
+      });
+    });
+  });
+
   describe('#usersInfo', function() {
     context('with existing users', function() {
       before(function(done) {
