@@ -328,19 +328,24 @@ describe('NativeClient', function() {
     context('with existing users', function() {
       before(function(done) {
         const adminDb = client.database.admin();
-        adminDb.authenticate('dba-admin', 'password', () => {
+        adminDb.authenticate('dba-admin', 'password', (authError) => {
+          assert.equal(null, authError);
           adminDb.addUser('dba-user1', 'password', {
             roles: [
               {role: 'clusterAdmin', db: 'admin'},
               {role: 'readWrite', db: 'candy'}
             ]
+          }, (addUserError1) => {
+            assert.equal(null, addUserError1);
+            adminDb.addUser('dba-user2', 'password', {
+              roles: [
+                {role: 'read', db: 'bar'}
+              ]
+            }, (addUserError2) => {
+              assert.equal(null, addUserError2);
+              done();
+            });
           });
-          adminDb.addUser('dba-user2', 'password', {
-            roles: [
-              {role: 'read', db: 'bar'}
-            ]
-          });
-          done();
         });
       });
 
