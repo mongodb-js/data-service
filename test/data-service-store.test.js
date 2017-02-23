@@ -91,7 +91,7 @@ describe('DataServiceStore', function() {
         unsubscribe();
         done();
       });
-      Actions.usersInfo('dba-user');
+      Actions.usersInfo('admin', 'dba-user');
     });
   });
 

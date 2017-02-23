@@ -328,6 +328,7 @@ describe('NativeClient', function() {
     context('with existing users', function() {
       before(function(done) {
         const adminDb = client.database.admin();
+        const notVerySecretAuthDb = client.database.db('notverysecretauth');
         adminDb.authenticate('dba-admin', 'password', (authError) => {
           assert.equal(null, authError);
           adminDb.addUser('dba-user1', 'password', {
@@ -343,20 +344,29 @@ describe('NativeClient', function() {
               ]
             }, (addUserError2) => {
               assert.equal(null, addUserError2);
-              done();
+
+              // Different authentication database is supported
+              notVerySecretAuthDb.addUser('dba-user3', 'password', {
+                roles: [
+                  {role: 'read', db: 'baz'}
+                ]
+              }, (addUserError3) => {
+                assert.equal(null, addUserError3);
+                done();
+              });
             });
           });
         });
       });
 
-      // There are at least two main permutations of usersInfo we should support
+      // There are at least three main permutations of usersInfo to support
       // https://docs.mongodb.com/manual/reference/command/usersInfo/
       it('fetches for a single user with no credentials and with privileges', function(done) {
         const options = {
           usersInfo: 'dba-user2',
           showPrivileges: true
         };
-        client.usersInfo(options, function(error, result) {
+        client.usersInfo('admin', options, function(error, result) {
           assert.equal(null, error);
           expect(result.users).to.be.deep.equal([
             {
@@ -447,8 +457,9 @@ describe('NativeClient', function() {
           done();
         });
       });
-      it('fetches for all users', function(done) {
-        client.usersInfo({usersInfo: 1}, function(error, result) {
+
+      it('fetches for all users on the admin DB', function(done) {
+        client.usersInfo('admin', {usersInfo: 1}, function(error, result) {
           assert.equal(null, error);
           expect(result.users).to.be.deep.equal([
             {
@@ -495,8 +506,33 @@ describe('NativeClient', function() {
           done();
         });
       });
+
+      it('can ask a different authenticationDatabase for its users', function(done) {
+        // Can't see why you'd want the configuration headache of
+        // not authenticating against the admin DB, but as it's supported:
+        // https://docs.mongodb.com/manual/core/security-users/#user-authentication-database
+        client.usersInfo('notverysecretauth', {usersInfo: 1}, function(error, result) {
+          assert.equal(null, error);
+          expect(result.users).to.be.deep.equal([
+            {
+              '_id': 'notverysecretauth.dba-user3',
+              'customData': {},
+              'db': 'notverysecretauth',
+              'roles': [
+                {
+                  'db': 'baz',
+                  'role': 'read'
+                }
+              ],
+              'user': 'dba-user3'
+            }
+          ]);
+          done();
+        });
+      });
+
       it('raises error if providing userInfo (non-plural typo)', function(done) {
-        client.usersInfo({userInfo: 1}, function(error, result) {
+        client.usersInfo('admin', {userInfo: 1}, function(error, result) {
           expect(error).to.match(/Unexpected keys found in usersInfo options: userInfo/);
           assert.equal(null, result);
           done();
