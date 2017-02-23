@@ -50,13 +50,13 @@ describe('DataServiceStore', function() {
       var unsubscribe = Actions.hostInfoComplete.listen(function(error, result) {
         expect(error).to.equal(null);
         expect(result.system).to.have.all.keys([
-          'currentTime', // 2017-02-22T07:01:35.999Z,
-          'hostname',    // 'rocket.local:27018',
-          'cpuAddrSize', // 64,
-          'memSizeMB',   // 16384,
-          'numCores',    // 4,
-          'cpuArch',     // 'x86_64',
-          'numaEnabled'  // false },
+          'currentTime', // 2017-02-22T07:01:35.999Z
+          'hostname',    // 'rocket.local:27018'
+          'cpuAddrSize', // 64
+          'memSizeMB',   // 16384
+          'numCores',    // 4
+          'cpuArch',     // 'x86_64'
+          'numaEnabled'  // false
         ]);
         unsubscribe();
         done();
