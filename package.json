@@ -35,7 +35,7 @@
     "mongodb-js-errors": "^0.3.0",
     "mongodb-ns": "^1.0.3",
     "mongodb-url": "^1.0.2",
-    "reflux": "^0.4.1"
+    "reflux": "^6.3.0"
   },
   "devDependencies": {
     "chai": "^3.4.1",
