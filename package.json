@@ -33,7 +33,7 @@
     "mongodb-index-model": "^0.6.4",
     "mongodb-instance-model": "^4.0.0",
     "mongodb-js-errors": "^0.3.0",
-    "mongodb-ns": "^1.0.3",
+    "mongodb-ns": "^2.0.0",
     "mongodb-url": "^2.0.0"
   },
   "devDependencies": {
