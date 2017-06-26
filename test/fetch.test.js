@@ -1,15 +1,9 @@
-var _ = require('lodash');
 var assert = require('assert');
 var Connection = require('mongodb-connection-model');
 var connect = Connection.connect;
-var format = require('util').format;
 var fetch = require('../').fetch;
 var runner = require('mongodb-runner');
 var debug = require('debug')('mongodb-instance-model:test:fetch');
-
-var fixtures = require('mongodb-connection-fixture').MATRIX.map(function(model) {
-  return new Connection(model);
-});
 
 describe('mongodb-instance-model#fetch', function() {
   describe('local', function() {
@@ -78,54 +72,4 @@ describe('mongodb-instance-model#fetch', function() {
       });
     });
   });
-
-  if (fixtures.length > 0) {
-    describe('functional #slow', function() {
-      _.map(_.groupBy(fixtures, 'authentication'), function(models, authentication) {
-        describe(format('Using authentication `%s`', authentication), function() {
-          _.each(models, function(model) {
-            describe(model.name, function() {
-              var db;
-              it('should connect', function(done) {
-                if (process.env.dry) {
-                  this.skip();
-                  return;
-                }
-                this.slow(5000);
-                this.timeout(20000);
-
-                connect(model, null, function(err, _db) {
-                  if (err) {
-                    return done(err);
-                  }
-                  db = _db;
-                  done();
-                });
-              });
-              it('should get instance details', function(done) {
-                if (process.env.dry) {
-                  this.skip();
-                  return;
-                }
-
-                this.slow(5000);
-                this.timeout(10000);
-                assert(db, 'requires successful connection');
-                fetch(db, function(err, res) {
-                  debug('got instance details', res);
-                  done(err, res);
-                });
-              });
-
-              after(function() {
-                if (db) {
-                  db.close();
-                }
-              });
-            });
-          });
-        });
-      });
-    });
-  }
 });
