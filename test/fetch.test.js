@@ -3,9 +3,9 @@ var Connection = require('mongodb-connection-model');
 var connect = Connection.connect;
 var fetch = require('../').fetch;
 var runner = require('mongodb-runner');
-var debug = require('debug')('mongodb-instance-model:test:fetch');
+var debug = require('debug')('mongodb-data-service:test:fetch');
 
-describe('mongodb-instance-model#fetch', function() {
+describe('mongodb-data-service#fetch', function() {
   describe('local', function() {
     var db;
     before(function(done) {
