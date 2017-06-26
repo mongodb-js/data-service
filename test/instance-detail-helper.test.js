@@ -1,7 +1,7 @@
 const assert = require('assert');
 const Connection = require('mongodb-connection-model');
 const connect = Connection.connect;
-const { getInstance } = require('../lib/fetch');
+const { getInstance } = require('../lib/instance-detail-helper');
 const runner = require('mongodb-runner');
 const debug = require('debug')('mongodb-data-service:test:fetch');
 
