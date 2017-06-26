@@ -1,9 +1,9 @@
-var assert = require('assert');
-var Connection = require('mongodb-connection-model');
-var connect = Connection.connect;
-var fetch = require('../').fetch;
-var runner = require('mongodb-runner');
-var debug = require('debug')('mongodb-data-service:test:fetch');
+const assert = require('assert');
+const Connection = require('mongodb-connection-model');
+const connect = Connection.connect;
+const { getInstance } = require('../lib/fetch');
+const runner = require('mongodb-runner');
+const debug = require('debug')('mongodb-data-service:test:fetch');
 
 describe('mongodb-data-service#fetch', function() {
   describe('local', function() {
@@ -29,7 +29,7 @@ describe('mongodb-data-service#fetch', function() {
     });
     it('should get instance details', function(done) {
       assert(db);
-      fetch(db, function(err, res) {
+      getInstance(db, function(err, res) {
         if (err) {
           return done(err);
         }
@@ -39,7 +39,7 @@ describe('mongodb-data-service#fetch', function() {
     });
     it('should not close the db after getting instance details', function(done) {
       assert(db);
-      fetch(db, function(err) {
+      getInstance(db, function(err) {
         if (err) {
           return done(err);
         }
@@ -63,7 +63,7 @@ describe('mongodb-data-service#fetch', function() {
       if (err) {
         return done(err);
       }
-      fetch(db, function(_err, res) {
+      getInstance(db, function(_err, res) {
         if (_err) {
           return done(_err);
         }
