@@ -7,7 +7,7 @@ const debug = require('debug')('mongodb-data-service:test:fetch');
 
 describe('mongodb-data-service#fetch', function() {
   describe('local', function() {
-    var db;
+    let db;
     before(function(done) {
       this.timeout(20000);
       runner.start({}, done);
@@ -18,7 +18,7 @@ describe('mongodb-data-service#fetch', function() {
       }
     });
     it('should connect to `localhost:27017`', function(done) {
-      var model = Connection.from('mongodb://localhost:27017');
+      const model = Connection.from('mongodb://localhost:27017');
       connect(model, null, function(err, _db) {
         if (err) {
           return done(err);
@@ -58,7 +58,7 @@ describe('mongodb-data-service#fetch', function() {
    * will be able to properly spin up deployments w authentication.
    */
   it.skip('should get instance details for john doe', function(done) {
-    var connection = Connection.from('john:doe@localhost:30000/admin?authMechanism=MONGODB-CR');
+    const connection = Connection.from('john:doe@localhost:30000/admin?authMechanism=MONGODB-CR');
     connect(connection, null, function(err, db) {
       if (err) {
         return done(err);
