@@ -2,23 +2,21 @@ const assert = require('assert');
 const Connection = require('mongodb-connection-model');
 const connect = Connection.connect;
 const { getInstance } = require('../lib/instance-detail-helper');
-const runner = require('mongodb-runner');
 const debug = require('debug')('mongodb-data-service:test:instance');
 
 describe('mongodb-data-service#instance', function() {
   describe('local', function() {
+    before(require('mongodb-runner/mocha/before')({
+      port: 27018
+    }));
+
+    after(require('mongodb-runner/mocha/after')({
+      port: 27018
+    }));
+
     let db;
-    before(function(done) {
-      this.timeout(20000);
-      runner.start({}, done);
-    });
-    after(function() {
-      if (db) {
-        db.close();
-      }
-    });
-    it('should connect to `localhost:27017`', function(done) {
-      const model = Connection.from('mongodb://localhost:27017');
+    it('should connect to `localhost:27018`', function(done) {
+      const model = Connection.from('mongodb://localhost:27018');
       connect(model, null, function(err, _db) {
         if (err) {
           return done(err);
