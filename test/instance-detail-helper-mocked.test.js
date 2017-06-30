@@ -10,7 +10,7 @@ const {
 } = require('../lib/instance-detail-helper');
 const fixtures = require('./fixtures');
 
-// var debug = require('debug')('mongodb-instance-model:test:instance-detail-helper-mocked');
+// var debug = require('debug')('mongodb-data-service:test:instance-detail-helper-mocked');
 
 
 describe('instance-detail-helper-mocked', function() {
