@@ -17,7 +17,7 @@ describe('NativeClient', function() {
   before(require('mongodb-runner/mocha/before')({
     port: 27018,
     slow: 1000,
-    timeout: 30000
+    timeout: 1000
   }));
 
   after(require('mongodb-runner/mocha/after')({
