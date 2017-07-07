@@ -17,8 +17,8 @@ describe('NativeClient', function() {
   before(require('mongodb-runner/mocha/before')({
     port: 27018,
     // Overrides for Travis
-    slow: 15000,
-    timeout: 15000
+    slow: 28657,
+    timeout: 28657
   }));
 
   after(require('mongodb-runner/mocha/after')({
