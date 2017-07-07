@@ -8,7 +8,7 @@ var ObjectId = require('bson').ObjectId;
 var DataService = require('../lib/data-service');
 
 describe('DataService', function() {
-  this.slow(10000);
+  this.slow(1000);
   this.timeout(20000);
   var service = new DataService(helper.connection);
 
