@@ -8,8 +8,8 @@ var ObjectId = require('bson').ObjectId;
 var DataService = require('../lib/data-service');
 
 describe('DataService', function() {
-  this.slow(1000);
-  this.timeout(20000);
+  this.slow(15000);
+  this.timeout(30000);
   var service = new DataService(helper.connection);
 
   before(require('mongodb-runner/mocha/before')({
