@@ -12,9 +12,9 @@ module.exports.eventStream = es;
 module.exports.stitchConnection = new Connection({
   hostname: '127.0.0.1',
   port: 8080,
-  stitchClientAppId: 'cool-app-aemfj',
-  stitchGroupId: '5970f24c5d153afcbb5b2323',
-  mongodb_username: 'leaf@tree.com',
+  stitchClientAppId: 'cool-app-dvfdk',
+  stitchGroupId: '597f4ba283fe9e31cd955fd4',
+  mongodb_username: 'test-user@domain.com',
   mongodb_password: 'password'
 });
 
