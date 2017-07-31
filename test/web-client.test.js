@@ -28,4 +28,14 @@ describe('WebClient', function() {
       });
     });
   });
+
+  describe('#find', function() {
+    it('yields the error and the results to the callback', function(done) {
+      client.find('data-service.test', {}, {}, function(error, results) {
+        expect(error).to.equal(null);
+        expect(results.length).to.equal(0);
+        done();
+      });
+    });
+  });
 });
