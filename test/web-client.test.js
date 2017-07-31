@@ -38,4 +38,14 @@ describe('WebClient', function() {
       });
     });
   });
+
+  describe('#aggregate', function() {
+    it('yields the error and the results to the callback', function(done) {
+      client.aggregate('data-service.test', [{ '$match': { a: 1 }}], {}, function(error, results) {
+        expect(error).to.equal(null);
+        expect(results.length).to.equal(0);
+        done();
+      });
+    });
+  });
 });
