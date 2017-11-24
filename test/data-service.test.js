@@ -13,7 +13,10 @@ describe('DataService', function() {
   var service = new DataService(helper.connection);
 
   before(require('mongodb-runner/mocha/before')({
-    port: 27018
+    port: 27018,
+    // Overrides for Travis
+    slow: 28657,
+    timeout: 28657
   }));
   after(require('mongodb-runner/mocha/after')());
 
