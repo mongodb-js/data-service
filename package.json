@@ -14,9 +14,9 @@
     "mongodb-js"
   ],
   "scripts": {
-    "pretest": "mongodb-runner start",
+    "pretest": "mongodb-runner start --port=27018",
     "test": "mocha",
-    "posttest": "mongodb-runner stop",
+    "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit"
   },
   "precommit": [
