@@ -14,10 +14,9 @@
     "mongodb-js"
   ],
   "scripts": {
-    "ci": "npm run check && npm test",
-    "pretest": "mongodb-runner install",
+    "pretest": "mongodb-runner start",
     "test": "mocha",
-    "fmt": "mongodb-js-fmt ./*.js ./test/*.js",
+    "posttest": "mongodb-runner stop",
     "check": "mongodb-js-precommit"
   },
   "precommit": [
@@ -55,7 +54,6 @@
     "eslint-config-mongodb-js": "^2.2.0",
     "mocha": "^5.2.0",
     "mock-require": "^2.0.1",
-    "mongodb-js-fmt": "^0.0.3",
     "mongodb-js-precommit": "^0.2.9",
     "mongodb-runner": "^4.1.0",
     "pre-commit": "^1.1.2"
