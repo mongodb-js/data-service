@@ -4,9 +4,10 @@ language: node_js
 node_js:
   - 8.9.3
 env:
-  - MONGODB_VERSION=3.4.x MONGODB_TOPOLOGY=standalone
-  - MONGODB_VERSION=stable MONGODB_TOPOLOGY=standalone
-  - MONGODB_VERSION=unstable MONGODB_TOPOLOGY=standalone
+  - DEBUG=mongo* MONGODB_VERSION=3.4.x MONGODB_TOPOLOGY=standalone
+  - DEBUG=mongo* MONGODB_VERSION=stable MONGODB_TOPOLOGY=standalone
+  - DEBUG=mongo* MONGODB_VERSION=stable MONGODB_TOPOLOGY=cluster
+  - DEBUG=mongo* MONGODB_VERSION=unstable MONGODB_TOPOLOGY=standalone
 before_install:
   - npm i -g npm
 install:
@@ -17,3 +18,4 @@ script:
 cache:
   directories:
     - '$HOME/.npm'
+    - '$HOME/.nvm/versions/node/v8.9.3/lib/node_modules/npm'
