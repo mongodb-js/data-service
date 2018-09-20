@@ -12,13 +12,6 @@ describe('DataService', function() {
   this.timeout(20000);
   var service = new DataService(helper.connection);
 
-  before(require('mongodb-runner/mocha/before')({
-    port: 27018
-  }));
-  after(require('mongodb-runner/mocha/after')({
-    port: 27018
-  }));
-
   before(function(done) {
     service.connect(done);
   });
