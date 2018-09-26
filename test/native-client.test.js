@@ -14,14 +14,6 @@ describe('NativeClient', function() {
   this.timeout(20000);
   var client = new NativeClient(helper.connection);
 
-  before(require('mongodb-runner/mocha/before')({
-    port: 27018
-  }));
-
-  after(require('mongodb-runner/mocha/after')({
-    port: 27018
-  }));
-
   before(function(done) {
     const callback = (err, result) => {
       const adminDb = client.database.admin();
