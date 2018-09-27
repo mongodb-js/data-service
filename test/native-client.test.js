@@ -452,6 +452,12 @@ describe('NativeClient', function() {
   describe('#top', function() {
     it('returns an object with the results from top', function(done) {
       client.top(function(err, result) {
+        if (client.isMongos) {
+          assert(err);
+          expect(err.message).to.equal('Top command is not available in mongos');
+          done();
+          return;
+        }
         assert.equal(null, err);
         expect(result.ok).to.equal(1);
         done();
