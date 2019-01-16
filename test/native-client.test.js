@@ -42,7 +42,7 @@ describe('NativeClient', function() {
               }
             };
             cb(null, db);
-            return {on: function() {}};
+            return { on: function() {} };
           }
         };
       };
@@ -52,7 +52,10 @@ describe('NativeClient', function() {
       });
 
       it('sets .isMongos to true when ismaster is from a mongos', function() {
-        mock('mongodb-connection-model', mockedConnectionModel({msg: 'isdbgrid'}));
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel({ msg: 'isdbgrid' })
+        );
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
         mockedClient.connect(function() {
@@ -62,7 +65,10 @@ describe('NativeClient', function() {
       });
 
       it('sets .isMongos to false when ismaster is not from a mongos', function() {
-        mock('mongodb-connection-model', mockedConnectionModel({ismaster: true}));
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel({ ismaster: true })
+        );
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
         mockedClient.connect(function() {
@@ -73,7 +79,10 @@ describe('NativeClient', function() {
       });
 
       it('sets .isWritable to true when the node is a primary replset member', function() {
-        mock('mongodb-connection-model', mockedConnectionModel({ismaster: true}));
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel({ ismaster: true })
+        );
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
         mockedClient.connect(function() {
@@ -83,7 +92,10 @@ describe('NativeClient', function() {
       });
 
       it('sets .isWritable to false when the node is a secondary replset member', function() {
-        mock('mongodb-connection-model', mockedConnectionModel({ismaster: false}));
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel({ ismaster: false })
+        );
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
         mockedClient.connect(function() {
@@ -93,7 +105,10 @@ describe('NativeClient', function() {
       });
 
       it('sets .isWritable to true when the node is a mongos', function() {
-        mock('mongodb-connection-model', mockedConnectionModel({msg: 'isdbgrid'}));
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel({ msg: 'isdbgrid' })
+        );
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
         mockedClient.connect(function() {
@@ -134,13 +149,24 @@ describe('NativeClient', function() {
     before(function(done) {
       var collection = client.database.collection('test');
       collection.insertMany(
-        [{title: 'this is my title', author: 'bob', posted: new Date(),
-          pageViews: 5, tags: [ 'fun', 'good', 'fun' ], other: { foo: 5 },
-          comments: [
-            { author: 'joe', text: 'this is cool' }, { author: 'sam', text: 'this is bad' }
-          ]},
-          {x: 1, y: 2},
-          {x: 3, y: 4}], done);
+        [
+          {
+            title: 'this is my title',
+            author: 'bob',
+            posted: new Date(),
+            pageViews: 5,
+            tags: ['fun', 'good', 'fun'],
+            other: { foo: 5 },
+            comments: [
+              { author: 'joe', text: 'this is cool' },
+              { author: 'sam', text: 'this is bad' }
+            ]
+          },
+          { x: 1, y: 2 },
+          { x: 3, y: 4 }
+        ],
+        done
+      );
     });
 
     after(function(done) {
@@ -151,8 +177,9 @@ describe('NativeClient', function() {
 
     context('with callback', function() {
       it('pipeline with $match', function(done) {
-        client.aggregate('data-service.test',
-          [{$match: {}}, {$group: {_id: '$x', total: {$sum: '$x'} } }],
+        client.aggregate(
+          'data-service.test',
+          [{ $match: {} }, { $group: { _id: '$x', total: { $sum: '$x' } } }],
           function(error, result) {
             assert.equal(null, error);
             result.toArray((err, r) => {
@@ -160,10 +187,12 @@ describe('NativeClient', function() {
               expect(r.length).to.equal(3);
               done();
             });
-          });
+          }
+        );
       });
       it('pipeline with $unwind, $group, $project', function(done) {
-        client.aggregate('data-service.test',
+        client.aggregate(
+          'data-service.test',
           [
             {
               $project: {
@@ -186,52 +215,87 @@ describe('NativeClient', function() {
             assert.equal(null, error);
             result.toArray((err, r) => {
               assert.equal(null, err);
-              expect(r).to.deep.equal(
-                [ { _id: { tags: 'good' }, authors: [ 'bob' ] },
-                  { _id: { tags: 'fun' }, authors: [ 'bob' ] } ]);
+              expect(r).to.deep.equal([
+                { _id: { tags: 'good' }, authors: ['bob'] },
+                { _id: { tags: 'fun' }, authors: ['bob'] }
+              ]);
               done();
             });
-          });
+          }
+        );
       });
     });
     context('with cursor', function() {
       it('pipeline with $match', function(done) {
         var count = 0;
-        client.aggregate('data-service.test',
-          [{$match: {}}, {$group: {_id: '$x', total: {$sum: '$x'} } }],
-          {'cursor': { batchSize: 10000 }}
-        ).forEach(function() { count++; }, function(err) {
-          assert.equal(null, err);
-          expect(count).to.equal(3);
-          done();
-        });
+        client
+          .aggregate(
+            'data-service.test',
+            [{ $match: {} }, { $group: { _id: '$x', total: { $sum: '$x' } } }],
+            { cursor: { batchSize: 10000 } }
+          )
+          .forEach(
+            function() {
+              count++;
+            },
+            function(err) {
+              assert.equal(null, err);
+              expect(count).to.equal(3);
+              done();
+            }
+          );
       });
       it('pipeline with $unwind, $group, $project', function(done) {
-        client.aggregate('data-service.test',
-          [{$project: {
-            author: 1,
-            tags: 1
-          }},
-            { $unwind: '$tags' }, {$group: { _id: {tags: '$tags'}, authors: {$addToSet: '$author' }}}],
-          {cursor: {batchSize: 100}}).toArray(function(error, docs) {
+        const pipeline = [
+          {
+            $project: {
+              author: 1,
+              tags: 1
+            }
+          },
+          { $unwind: '$tags' },
+          {
+            $group: {
+              _id: { tags: '$tags' },
+              authors: { $addToSet: '$author' }
+            }
+          }
+        ];
+
+        client
+          .aggregate('data-service.test', pipeline, {
+            cursor: { batchSize: 100 }
+          })
+          .toArray(function(error, docs) {
             assert.equal(null, error);
-            expect(docs).to.deep.equal(
-              [{_id: {tags: 'good'}, authors: ['bob']},
-                {_id: {tags: 'fun'}, authors: ['bob']}]);
+            expect(docs).to.deep.equal([
+              { _id: { tags: 'good' }, authors: ['bob'] },
+              { _id: { tags: 'fun' }, authors: ['bob'] }
+            ]);
             done();
           });
       });
       it('errors when given a bad option', function(done) {
         try {
-          client.aggregate('data-service.test',
-            [{$project: {
-              author: 1,
-              tags: 1
-            }},
-            { $unwind: '$tags'},
-            { $group: {_id: {tags: '$tags'}, authors: {$addToSet: '$author'}}}
+          client.aggregate(
+            'data-service.test',
+            [
+              {
+                $project: {
+                  author: 1,
+                  tags: 1
+                }
+              },
+              { $unwind: '$tags' },
+              {
+                $group: {
+                  _id: { tags: '$tags' },
+                  authors: { $addToSet: '$author' }
+                }
+              }
             ],
-            { cursor: 1});
+            { cursor: 1 }
+          );
         } catch (err) {
           expect(err.message).to.equal('cursor options must be an object');
           done();
@@ -255,13 +319,18 @@ describe('NativeClient', function() {
 
     context('when a filter is provided', function() {
       it('returns a cursor for the matching documents', function(done) {
-        client.find('data-service.test', {
-          a: 1
-        }, {}, function(error, docs) {
-          assert.equal(null, error);
-          expect(docs.length).to.equal(1);
-          done();
-        });
+        client.find(
+          'data-service.test',
+          {
+            a: 1
+          },
+          {},
+          function(error, docs) {
+            assert.equal(null, error);
+            expect(docs.length).to.equal(1);
+            done();
+          }
+        );
       });
     });
 
@@ -277,13 +346,18 @@ describe('NativeClient', function() {
 
     context('when options are provided', function() {
       it('returns a cursor for the documents', function(done) {
-        client.find('data-service.test', {}, {
-          skip: 1
-        }, function(error, docs) {
-          assert.equal(null, error);
-          expect(docs.length).to.equal(1);
-          done();
-        });
+        client.find(
+          'data-service.test',
+          {},
+          {
+            skip: 1
+          },
+          function(error, docs) {
+            assert.equal(null, error);
+            expect(docs.length).to.equal(1);
+            done();
+          }
+        );
       });
     });
   });
@@ -398,9 +472,11 @@ describe('NativeClient', function() {
       });
 
       it('returns empty stats for the readonly views', function(done) {
-        const pipeline = [{ '$match': { name: 'test' }}];
+        const pipeline = [{ $match: { name: 'test' } }];
         const options = { viewOn: 'test', pipeline: pipeline };
-        client.createCollection('data-service.readonlyfoo', options, function(error) {
+        client.createCollection('data-service.readonlyfoo', options, function(
+          error
+        ) {
           if (error) {
             assert.notEqual(null, error.message);
             done();
@@ -453,7 +529,9 @@ describe('NativeClient', function() {
       client.top(function(err, result) {
         if (client.isMongos) {
           assert(err);
-          expect(err.message).to.equal('Top command is not available in mongos');
+          expect(err.message).to.equal(
+            'Top command is not available in mongos'
+          );
           done();
           return;
         }
@@ -494,13 +572,18 @@ describe('NativeClient', function() {
   describe('#count', function() {
     context('when a filter is provided', function() {
       it('returns a count for the matching documents', function(done) {
-        client.count('data-service.test', {
-          a: 1
-        }, {}, function(error, count) {
-          assert.equal(null, error);
-          expect(count).to.equal(0);
-          done();
-        });
+        client.count(
+          'data-service.test',
+          {
+            a: 1
+          },
+          {},
+          function(error, count) {
+            assert.equal(null, error);
+            expect(count).to.equal(0);
+            done();
+          }
+        );
       });
     });
 
@@ -515,12 +598,17 @@ describe('NativeClient', function() {
         });
 
         it('does not throw the error', function(done) {
-          client.count('data-service.test', {
-            '$where': 'function() { sleep(5500); return true; }'
-          }, { maxTimeMS: 5000 }, function(error) {
-            expect(error).to.not.equal(null);
-            done();
-          });
+          client.count(
+            'data-service.test',
+            {
+              $where: 'function() { sleep(5500); return true; }'
+            },
+            { maxTimeMS: 5000 },
+            function(error) {
+              expect(error).to.not.equal(null);
+              done();
+            }
+          );
         });
       });
     });
@@ -552,7 +640,10 @@ describe('NativeClient', function() {
           } else if (items[0].name === 'test') {
             expect(items[1].name).to.equal('foo');
           } else {
-            assert(false, 'Collection returned from listCollections has incorrect name');
+            assert(
+              false,
+              'Collection returned from listCollections has incorrect name'
+            );
           }
           done();
         });
@@ -575,8 +666,8 @@ describe('NativeClient', function() {
     context('when options are provided', function() {
       it('creates a new index with the provided options', function(done) {
         const namespace = 'data-service.test';
-        var spec = {a: 1};
-        var options = {unique: true};
+        var spec = { a: 1 };
+        var options = { unique: true };
         client.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
           client.indexes(namespace, function(err, indexes) {
@@ -591,7 +682,7 @@ describe('NativeClient', function() {
     context('when no options are provided', function() {
       it('creates a new single index', function(done) {
         const namespace = 'data-service.test';
-        var spec = {b: 1};
+        var spec = { b: 1 };
         var options = {};
         client.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
@@ -605,7 +696,7 @@ describe('NativeClient', function() {
 
       it('creates a new compound index', function(done) {
         const namespace = 'data-service.test';
-        var spec = {a: -1, b: 1};
+        var spec = { a: -1, b: 1 };
         var options = {};
         client.createIndex(namespace, spec, options, function(error) {
           assert.equal(null, error);
@@ -622,36 +713,56 @@ describe('NativeClient', function() {
   describe('#explain', function() {
     context('when a filter is provided', function() {
       it('returns an explain object for the provided filter', function(done) {
-        client.explain('data-service.test', {
-          a: 1
-        }, {}, function(error, explanation) {
-          assert.equal(null, error);
-          expect(explanation).to.be.an('object');
-          done();
-        });
+        client.explain(
+          'data-service.test',
+          {
+            a: 1
+          },
+          {},
+          function(error, explanation) {
+            assert.equal(null, error);
+            expect(explanation).to.be.an('object');
+            done();
+          }
+        );
       });
     });
   });
 
   describe('#deleteOne', function() {
     it('deletes the document from the collection', function(done) {
-      client.insertOne('data-service.test', {
-        a: 500
-      }, {}, function(err) {
-        assert.equal(null, err);
-        client.deleteOne('data-service.test', {
+      client.insertOne(
+        'data-service.test',
+        {
           a: 500
-        }, {}, function(er) {
-          assert.equal(null, er);
-          client.find('data-service.test', {
-            a: 500
-          }, {}, function(error, docs) {
-            assert.equal(null, error);
-            expect(docs.length).to.equal(0);
-            done();
-          });
-        });
-      });
+        },
+        {},
+        function(err) {
+          assert.equal(null, err);
+          client.deleteOne(
+            'data-service.test',
+            {
+              a: 500
+            },
+            {},
+            function(er) {
+              assert.equal(null, er);
+              client.find(
+                'data-service.test',
+                {
+                  a: 500
+                },
+                {},
+                function(error, docs) {
+                  assert.equal(null, error);
+                  expect(docs.length).to.equal(0);
+                  done();
+                }
+              );
+            }
+          );
+        }
+      );
     });
   });
 
@@ -669,7 +780,7 @@ describe('NativeClient', function() {
         assert.equal(null, error);
         client.listCollections(dbName, {}, function(err, items) {
           assert.equal(null, err);
-          expect(items).to.not.include({name: 'bar', options: {}});
+          expect(items).to.not.include({ name: 'bar', options: {} });
           done();
         });
       });
@@ -678,11 +789,12 @@ describe('NativeClient', function() {
 
   describe('#dropDatabase', function() {
     before(function(done) {
-      client.client.db('mangoDB').createCollection('testing',
-      {}, function(error) {
-        assert.equal(null, error);
-        done();
-      });
+      client.client
+        .db('mangoDB')
+        .createCollection('testing', {}, function(error) {
+          assert.equal(null, error);
+          done();
+        });
     });
 
     it('drops a database', function(done) {
@@ -690,7 +802,7 @@ describe('NativeClient', function() {
         assert.equal(null, error);
         client.listDatabases(function(err, dbs) {
           assert.equal(null, err);
-          expect(dbs).to.not.have.property({name: 'mangoDB'});
+          expect(dbs).to.not.have.property({ name: 'mangoDB' });
           done();
         });
       });
@@ -699,12 +811,16 @@ describe('NativeClient', function() {
 
   describe('#dropIndex', function() {
     before(function(done) {
-      client.database.collection('test').createIndex({
-        a: 1
-      }, {}, function(error) {
-        assert.equal(null, error);
-        done();
-      });
+      client.database.collection('test').createIndex(
+        {
+          a: 1
+        },
+        {},
+        function(error) {
+          assert.equal(null, error);
+          done();
+        }
+      );
     });
 
     it('removes an index from a collection', function(done) {
@@ -713,7 +829,7 @@ describe('NativeClient', function() {
         assert.equal(null, error);
         client.indexes(namespace, function(err, indexes) {
           assert.equal(null, err);
-          expect(indexes).to.not.have.property({name: 'a_1'});
+          expect(indexes).to.not.have.property({ name: 'a_1' });
           done();
         });
       });
@@ -722,25 +838,43 @@ describe('NativeClient', function() {
 
   describe('#deleteMany', function() {
     it('deletes the documents from the collection', function(done) {
-      client.insertMany('data-service.test', [{
-        a: 500
-      }, {
-        a: 500
-      }], {}, function(err) {
-        assert.equal(null, err);
-        client.deleteMany('data-service.test', {
-          a: 500
-        }, {}, function(er) {
-          assert.equal(null, er);
-          client.find('data-service.test', {
+      client.insertMany(
+        'data-service.test',
+        [
+          {
             a: 500
-          }, {}, function(error, docs) {
-            assert.equal(null, error);
-            expect(docs.length).to.equal(0);
-            done();
-          });
-        });
-      });
+          },
+          {
+            a: 500
+          }
+        ],
+        {},
+        function(err) {
+          assert.equal(null, err);
+          client.deleteMany(
+            'data-service.test',
+            {
+              a: 500
+            },
+            {},
+            function(er) {
+              assert.equal(null, er);
+              client.find(
+                'data-service.test',
+                {
+                  a: 500
+                },
+                {},
+                function(error, docs) {
+                  assert.equal(null, error);
+                  expect(docs.length).to.equal(0);
+                  done();
+                }
+              );
+            }
+          );
+        }
+      );
     });
   });
 
@@ -755,30 +889,36 @@ describe('NativeClient', function() {
       var id = new ObjectId();
 
       it('returns the updated document', function(done) {
-        client.insertOne('data-service.test', {
-          _id: id,
-          a: 500
-        }, {}, function(err) {
-          assert.equal(null, err);
-          client.findOneAndReplace(
-            'data-service.test',
-            {
-              _id: id
-            },
-            {
-              b: 5
-            },
-            {
-              returnOriginal: false
-            }, function(error, result) {
-              expect(error).to.equal(null);
-              expect(result._id.toString()).to.deep.equal(id.toString());
-              expect(result.b).to.equal(5);
-              expect(result.hasOwnProperty('a')).to.equal(false);
-              done();
-            }
-          );
-        });
+        client.insertOne(
+          'data-service.test',
+          {
+            _id: id,
+            a: 500
+          },
+          {},
+          function(err) {
+            assert.equal(null, err);
+            client.findOneAndReplace(
+              'data-service.test',
+              {
+                _id: id
+              },
+              {
+                b: 5
+              },
+              {
+                returnOriginal: false
+              },
+              function(error, result) {
+                expect(error).to.equal(null);
+                expect(result._id.toString()).to.deep.equal(id.toString());
+                expect(result.b).to.equal(5);
+                expect(result.hasOwnProperty('a')).to.equal(false);
+                done();
+              }
+            );
+          }
+        );
       });
     });
 
@@ -786,27 +926,33 @@ describe('NativeClient', function() {
       var id = new ObjectId();
 
       it('returns the updated document', function(done) {
-        client.insertOne('data-service.test', {
-          _id: id,
-          a: 500
-        }, {}, function(err) {
-          assert.equal(null, err);
-          client.findOneAndReplace(
-            'data-service.test',
-            {
-              _id: id
-            },
-            {
-              $b: 5
-            },
-            {
-              returnOriginal: false
-            }, function(error) {
-              expect(error.message).to.not.equal(null);
-              done();
-            }
-          );
-        });
+        client.insertOne(
+          'data-service.test',
+          {
+            _id: id,
+            a: 500
+          },
+          {},
+          function(err) {
+            assert.equal(null, err);
+            client.findOneAndReplace(
+              'data-service.test',
+              {
+                _id: id
+              },
+              {
+                $b: 5
+              },
+              {
+                returnOriginal: false
+              },
+              function(error) {
+                expect(error.message).to.not.equal(null);
+                done();
+              }
+            );
+          }
+        );
       });
     });
   });
@@ -855,18 +1001,28 @@ describe('NativeClient', function() {
     });
 
     it('inserts the document into the collection', function(done) {
-      client.insertOne('data-service.test', {
-        a: 500
-      }, {}, function(err) {
-        assert.equal(null, err);
-        client.find('data-service.test', {
+      client.insertOne(
+        'data-service.test',
+        {
           a: 500
-        }, {}, function(error, docs) {
-          assert.equal(null, error);
-          expect(docs.length).to.equal(1);
-          done();
-        });
-      });
+        },
+        {},
+        function(err) {
+          assert.equal(null, err);
+          client.find(
+            'data-service.test',
+            {
+              a: 500
+            },
+            {},
+            function(error, docs) {
+              assert.equal(null, error);
+              expect(docs.length).to.equal(1);
+              done();
+            }
+          );
+        }
+      );
     });
   });
 
@@ -878,20 +1034,33 @@ describe('NativeClient', function() {
     });
 
     it('inserts the documents into the collection', function(done) {
-      client.insertMany('data-service.test', [{
-        a: 500
-      }, {
-        a: 500
-      }], {}, function(err) {
-        assert.equal(null, err);
-        client.find('data-service.test', {
-          a: 500
-        }, {}, function(error, docs) {
-          assert.equal(null, error);
-          expect(docs.length).to.equal(2);
-          done();
-        });
-      });
+      client.insertMany(
+        'data-service.test',
+        [
+          {
+            a: 500
+          },
+          {
+            a: 500
+          }
+        ],
+        {},
+        function(err) {
+          assert.equal(null, err);
+          client.find(
+            'data-service.test',
+            {
+              a: 500
+            },
+            {},
+            function(error, docs) {
+              assert.equal(null, error);
+              expect(docs.length).to.equal(2);
+              done();
+            }
+          );
+        }
+      );
     });
   });
 
@@ -911,15 +1080,19 @@ describe('NativeClient', function() {
     context('when no filter is provided', function() {
       it('returns a stream of sampled documents', function(done) {
         var seen = 0;
-        client.sample('data-service.test')
-          .pipe(eventStream.through(function(doc) {
-            seen++;
-            this.emit('data', doc);
-          }, function() {
-            this.emit('end');
-            expect(seen).to.equal(2);
-            done();
-          }));
+        client.sample('data-service.test').pipe(
+          eventStream.through(
+            function(doc) {
+              seen++;
+              this.emit('data', doc);
+            },
+            function() {
+              this.emit('end');
+              expect(seen).to.equal(2);
+              done();
+            }
+          )
+        );
       });
     });
   });
@@ -946,27 +1119,43 @@ describe('NativeClient', function() {
     });
 
     it('updates the document', function(done) {
-      client.insertOne('data-service.test', {
-        a: 500
-      }, {}, function(err) {
-        assert.equal(null, err);
-        client.updateOne('data-service.test', {
+      client.insertOne(
+        'data-service.test',
+        {
           a: 500
-        }, {
-          $set: {
-            a: 600
-          }
-        }, {}, function(er) {
-          assert.equal(null, er);
-          client.find('data-service.test', {
-            a: 600
-          }, {}, function(error, docs) {
-            assert.equal(null, error);
-            expect(docs.length).to.equal(1);
-            done();
-          });
-        });
-      });
+        },
+        {},
+        function(err) {
+          assert.equal(null, err);
+          client.updateOne(
+            'data-service.test',
+            {
+              a: 500
+            },
+            {
+              $set: {
+                a: 600
+              }
+            },
+            {},
+            function(er) {
+              assert.equal(null, er);
+              client.find(
+                'data-service.test',
+                {
+                  a: 600
+                },
+                {},
+                function(error, docs) {
+                  assert.equal(null, error);
+                  expect(docs.length).to.equal(1);
+                  done();
+                }
+              );
+            }
+          );
+        }
+      );
     });
   });
 
@@ -978,29 +1167,48 @@ describe('NativeClient', function() {
     });
 
     it('updates the documents', function(done) {
-      client.insertMany('data-service.test', [{
-        a: 500
-      }, {
-        a: 500
-      }], {}, function(err) {
-        assert.equal(null, err);
-        client.updateMany('data-service.test', {
-          a: 500
-        }, {
-          $set: {
-            a: 600
+      client.insertMany(
+        'data-service.test',
+        [
+          {
+            a: 500
+          },
+          {
+            a: 500
           }
-        }, {}, function(er) {
-          assert.equal(null, er);
-          client.find('data-service.test', {
-            a: 600
-          }, {}, function(error, docs) {
-            assert.equal(null, error);
-            expect(docs.length).to.equal(2);
-            done();
-          });
-        });
-      });
+        ],
+        {},
+        function(err) {
+          assert.equal(null, err);
+          client.updateMany(
+            'data-service.test',
+            {
+              a: 500
+            },
+            {
+              $set: {
+                a: 600
+              }
+            },
+            {},
+            function(er) {
+              assert.equal(null, er);
+              client.find(
+                'data-service.test',
+                {
+                  a: 600
+                },
+                {},
+                function(error, docs) {
+                  assert.equal(null, error);
+                  expect(docs.length).to.equal(2);
+                  done();
+                }
+              );
+            }
+          );
+        }
+      );
     });
   });
 });
