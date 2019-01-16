@@ -15,6 +15,9 @@ describe('DataService', function() {
   before(function(done) {
     service.connect(done);
   });
+  after(function(done) {
+    service.disconnect(done);
+  });
 
   describe('#deleteOne', function() {
     it('deletes the document from the collection', function(done) {

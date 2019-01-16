@@ -8,6 +8,9 @@ describe('mongodb-data-service#instance', function() {
   describe('local', function() {
     let client;
     let db;
+    after(function(done) {
+      client.close(done);
+    });
     it('should connect to `localhost:27018`', function(done) {
       const model = Connection.from('mongodb://localhost:27018/data-service');
       connect(

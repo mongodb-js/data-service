@@ -22,6 +22,10 @@ describe('NativeClient', function() {
     client.connect(callback);
   });
 
+  after(function(done) {
+    client.disconnect(done);
+  });
+
   describe('#connect', function() {
     context('when mocking connection-model', function() {
       /*
