@@ -14,9 +14,9 @@
     "mongodb-js"
   ],
   "scripts": {
-    "pretest": "wtfnode ./node_modules/.bin/mongodb-runner start --port=27018",
-    "test": "wtfnode ./node_modules/.bin/_mocha",
-    "posttest": "wtfnode ./node_modules/.bin/mongodb-runner stop --port 27018",
+    "pretest": "mongodb-runner start --port=27018",
+    "test": "mocha",
+    "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit"
   },
   "precommit": [
