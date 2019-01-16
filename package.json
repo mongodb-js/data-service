@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "pretest": "mongodb-runner start --port=27018",
-    "test": "mocha",
+    "test": "mocha -r test/diagnostic-header.js",
     "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit"
   },
