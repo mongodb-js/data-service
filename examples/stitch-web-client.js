@@ -6,7 +6,6 @@ const { CONNECTION_TYPE_VALUES } = require('mongodb-connection-model');
  * A browser based client that wraps a stitch client instance.
  */
 class WebClient {
-
   /**
    * Execute an aggregation framework pipeline with the provided options on the
    * collection. Async if called with a callback function, otherwise function
@@ -19,10 +18,12 @@ class WebClient {
    * @param {Function} callback - The callback (optional)
    */
   aggregate(ns, pipeline, options, callback) {
-    this._getCollection(ns).aggregate(pipeline)
-      .then((results) => {
+    this._getCollection(ns)
+      .aggregate(pipeline)
+      .then(results => {
         callback(null, results);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -52,7 +53,8 @@ class WebClient {
       .login(this.model.mongodb_username, this.model.mongodb_password)
       .then(() => {
         callback(null, this.stitchClient);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -67,10 +69,12 @@ class WebClient {
    * @param {function} callback - The callback function.
    */
   count(ns, filter, options, callback) {
-    this._getCollection(ns).count(filter, options)
-      .then((number) => {
+    this._getCollection(ns)
+      .count(filter, options)
+      .then(number => {
         callback(null, number);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -84,10 +88,12 @@ class WebClient {
    * @param {Function} callback - The callback.
    */
   deleteOne(ns, filter, options, callback) {
-    this._getCollection(ns).deleteOne(filter, options)
-      .then((result) => {
+    this._getCollection(ns)
+      .deleteOne(filter, options)
+      .then(result => {
         callback(null, result);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -101,10 +107,12 @@ class WebClient {
    * @param {Function} callback - The callback.
    */
   deleteMany(ns, filter, options, callback) {
-    this._getCollection(ns).deleteMany(filter, options)
-      .then((result) => {
+    this._getCollection(ns)
+      .deleteMany(filter, options)
+      .then(result => {
         callback(null, result);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -118,10 +126,12 @@ class WebClient {
    * @param {Function} callback - The callback.
    */
   find(ns, filter, options, callback) {
-    this._getCollection(ns).find(filter, options)
-      .then((results) => {
+    this._getCollection(ns)
+      .find(filter, options)
+      .then(results => {
         callback(null, results);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -135,19 +145,23 @@ class WebClient {
    * @param {Function} callback - The callback.
    */
   insertOne(ns, doc, options, callback) {
-    this._getCollection(ns).insertOne(doc)
-      .then((result) => {
+    this._getCollection(ns)
+      .insertOne(doc)
+      .then(result => {
         callback(null, result);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
 
   updateOne(ns, filter, update, options, callback) {
-    this._getCollection(ns).updateOne(filter, update, options)
-      .then((result) => {
+    this._getCollection(ns)
+      .updateOne(filter, update, options)
+      .then(result => {
         callback(null, result);
-      }).catch((err) => {
+      })
+      .catch(err => {
         callback(err);
       });
   }
@@ -156,10 +170,15 @@ class WebClient {
     const namespace = toNS(ns);
     let db;
     if (this.model.connectionType === CONNECTION_TYPE_VALUES.STITCH_ON_PREM) {
-      db = this.stitchClient.service('mongodb', this.model.stitchServiceName)
-            .db(namespace.database);
-    } else if (this.model.connectionType === CONNECTION_TYPE_VALUES.STITCH_ATLAS) {
-      db = this.stitchClient.service('mongodb', 'mongodb-atlas').db(namespace.database);
+      db = this.stitchClient
+        .service('mongodb', this.model.stitchServiceName)
+        .db(namespace.database);
+    } else if (
+      this.model.connectionType === CONNECTION_TYPE_VALUES.STITCH_ATLAS
+    ) {
+      db = this.stitchClient
+        .service('mongodb', 'mongodb-atlas')
+        .db(namespace.database);
     }
 
     return db.collection(namespace.collection);
