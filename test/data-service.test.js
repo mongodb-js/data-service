@@ -824,7 +824,7 @@ describe('DataService', function() {
     });
 
     it('creates a new view', function(done) {
-      service.createView('myView', 'data-service.test', [{$project: {_id: 1, a: 0}}], {}, function(err) {
+      service.createView('myView', 'data-service.test', [{$project: {a: 0}}], {}, function(err) {
         if (err) return done(err);
         done();
       });
@@ -845,23 +845,20 @@ describe('DataService', function() {
     });
 
     it('updates the view', function(done) {
-      service.updateView('myView', 'data-service.test', [{ $project: { _id: 1, a: 1 } }], {}, function(err) {
+      service.updateView('myView', 'data-service.test', [{ $project: { a: 1 } }], {}, function(err) {
         if (err) return done(err);
         done();
       });
     });
 
     it('returns documents from the updated', function(done) {
-      service.find('data-service.myView', {}, {}, function(err, cursor) {
+      service.find('data-service.myView', {}, {}, function(err, docs) {
         if (err) return done(err);
-        cursor.toArray(function(_err, docs) {
-          if (err) return done(_err);
 
-          assert.equal(docs.length, 2);
-          assert.strictEqual(docs[0].a, 1);
-          assert.strictEqual(docs[1].a, 2);
-          done();
-        });
+        assert.equal(docs.length, 2);
+        assert.strictEqual(docs[0].a, 1);
+        assert.strictEqual(docs[1].a, 2);
+        done();
       });
     });
 
