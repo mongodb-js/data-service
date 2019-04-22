@@ -831,16 +831,13 @@ describe('DataService', function() {
     });
 
     it('returns documents from the view', function(done) {
-      service.find('data-service.myView', {}, {}, function(err, cursor) {
+      service.find('data-service.myView', {}, {}, function(err, docs) {
         if (err) return done(err);
-        cursor.toArray(function(_err, docs) {
-          if (err) return done(_err);
 
-          assert.equal(docs.length, 2);
-          assert.strictEqual(docs[0].a, undefined);
-          assert.strictEqual(docs[1].a, undefined);
-          done();
-        });
+        assert.equal(docs.length, 2);
+        assert.strictEqual(docs[0].a, undefined);
+        assert.strictEqual(docs[1].a, undefined);
+        done();
       });
     });
 
