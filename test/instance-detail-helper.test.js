@@ -2,7 +2,8 @@ const assert = require('assert');
 const Connection = require('mongodb-connection-model');
 const connect = Connection.connect;
 const { getInstance } = require('../lib/instance-detail-helper');
-const debug = require('debug')('mongodb-data-service:test:instance');
+const helper = require('./helper');
+const DataService = require('../lib/data-service');
 
 describe('mongodb-data-service#instance', function() {
   describe('local', function() {
@@ -37,31 +38,49 @@ describe('mongodb-data-service#instance', function() {
         });
       });
     });
-  });
 
-  /**
-   * @todo (imlucas) After mongodb-tools rewrite, http://npm.im/mongodb-runner
-   * will be able to properly spin up deployments w authentication.
-   */
-  it.skip('should get instance details for john doe', function(done) {
-    const connection = Connection.from(
-      'john:doe@localhost:30000/admin?authMechanism=MONGODB-CR'
-    );
-    connect(
-      connection,
-      null,
-      function(err, _client) {
-        if (err) {
-          return done(err);
-        }
-        getInstance(_client, _client.db('data-service'), function(_err, res) {
-          if (_err) {
-            return done(_err);
-          }
-          debug('instance details', JSON.stringify(res, null, 2));
+    describe('views', function() {
+      var service = new DataService(helper.connection);
+      before(function(done) {
+        service.connect(function(err) {
+          if (err) return done(err);
+          helper.insertTestDocuments(service.client, function() {
+            done();
+          });
+        });
+      });
+
+      after(function(done) {
+        helper.deleteTestDocuments(service.client, function() {
           done();
         });
-      }
-    );
+      });
+
+      it('creates a new view', function(done) {
+        service.createView(
+          'myView',
+          'data-service.test',
+          [{ $project: { a: 0 } }],
+          {},
+          function(err) {
+            if (err) return done(err);
+            done();
+          }
+        );
+      });
+
+      it('includes the view details in instance details', function(done) {
+        service.instance({}, function(err, res) {
+          if (err) return done(err);
+
+          console.log('res', res);
+          done();
+        });
+      });
+
+      it('drops the view', function(done) {
+        service.dropView('data-service.myView', done);
+      });
+    });
   });
 });
