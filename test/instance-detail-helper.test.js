@@ -4,6 +4,7 @@ const connect = Connection.connect;
 const { getInstance } = require('../lib/instance-detail-helper');
 const helper = require('./helper');
 const DataService = require('../lib/data-service');
+const _ = require('lodash');
 
 describe('mongodb-data-service#instance', function() {
   describe('local', function() {
@@ -41,6 +42,7 @@ describe('mongodb-data-service#instance', function() {
 
     describe('views', function() {
       var service = new DataService(helper.connection);
+      var instanceDetails = null;
       before(function(done) {
         service.connect(function(err) {
           if (err) return done(err);
@@ -69,12 +71,28 @@ describe('mongodb-data-service#instance', function() {
         );
       });
 
-      it('includes the view details in instance details', function(done) {
+      it('gets the instance details', function(done) {
         service.instance({}, function(err, res) {
           if (err) return done(err);
-
-          console.log('res', res);
+          instanceDetails = res;
           done();
+        });
+      });
+
+      it('includes the view details in instance details', function() {
+        const viewInfo = _.find(instanceDetails.collections, [
+          '_id',
+          'data-service.myView'
+        ]);
+        assert.deepEqual(viewInfo, {
+          _id: 'data-service.myView',
+          name: 'myView',
+          database: 'data-service',
+          readonly: true,
+          collation: null,
+          type: 'view',
+          view_on: 'test',
+          pipeline: [{ $project: { a: 0 } }]
         });
       });
 
