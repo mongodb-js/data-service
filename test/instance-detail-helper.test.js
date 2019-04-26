@@ -39,66 +39,67 @@ describe('mongodb-data-service#instance', function() {
         });
       });
     });
+    if (process.env.MONGODB_TOPOLOGY !== 'cluster') {
+      describe('views', function() {
+        var service = new DataService(helper.connection);
+        var instanceDetails = null;
+        before(function(done) {
+          service.connect(function(err) {
+            if (err) return done(err);
+            helper.insertTestDocuments(service.client, function() {
+              done();
+            });
+          });
+        });
 
-    describe('views', function() {
-      var service = new DataService(helper.connection);
-      var instanceDetails = null;
-      before(function(done) {
-        service.connect(function(err) {
-          if (err) return done(err);
-          helper.insertTestDocuments(service.client, function() {
+        after(function(done) {
+          helper.deleteTestDocuments(service.client, function() {
             done();
           });
         });
-      });
 
-      after(function(done) {
-        helper.deleteTestDocuments(service.client, function() {
-          done();
+        it('creates a new view', function(done) {
+          service.createView(
+            'myView',
+            'data-service.test',
+            [{ $project: { a: 0 } }],
+            {},
+            function(err) {
+              if (err) return done(err);
+              done();
+            }
+          );
         });
-      });
 
-      it('creates a new view', function(done) {
-        service.createView(
-          'myView',
-          'data-service.test',
-          [{ $project: { a: 0 } }],
-          {},
-          function(err) {
+        it('gets the instance details', function(done) {
+          service.instance({}, function(err, res) {
             if (err) return done(err);
+            instanceDetails = res;
             done();
-          }
-        );
-      });
+          });
+        });
 
-      it('gets the instance details', function(done) {
-        service.instance({}, function(err, res) {
-          if (err) return done(err);
-          instanceDetails = res;
-          done();
+        it('includes the view details in instance details', function() {
+          const viewInfo = _.find(instanceDetails.collections, [
+            '_id',
+            'data-service.myView'
+          ]);
+          assert.deepEqual(viewInfo, {
+            _id: 'data-service.myView',
+            name: 'myView',
+            database: 'data-service',
+            readonly: true,
+            collation: null,
+            type: 'view',
+            view_on: 'test',
+            pipeline: [{ $project: { a: 0 } }]
+          });
+        });
+
+        it('drops the view', function(done) {
+          service.dropView('data-service.myView', done);
         });
       });
-
-      it('includes the view details in instance details', function() {
-        const viewInfo = _.find(instanceDetails.collections, [
-          '_id',
-          'data-service.myView'
-        ]);
-        assert.deepEqual(viewInfo, {
-          _id: 'data-service.myView',
-          name: 'myView',
-          database: 'data-service',
-          readonly: true,
-          collation: null,
-          type: 'view',
-          view_on: 'test',
-          pipeline: [{ $project: { a: 0 } }]
-        });
-      });
-
-      it('drops the view', function(done) {
-        service.dropView('data-service.myView', done);
-      });
-    });
+    }
   });
 });
