@@ -103,7 +103,7 @@ describe('NativeClient', function() {
       });
     });
 
-    context('when an invalid connection was provided', function() {
+    xcontext('when an invalid connection was provided', function() {
       var badConnection = new Connection({
         hostname: '127.0.0.1',
         port: 27050,
