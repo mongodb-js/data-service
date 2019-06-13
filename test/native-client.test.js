@@ -110,7 +110,8 @@ describe('NativeClient', function() {
         ns: 'data-service'
       });
       var badClient = new NativeClient(badConnection);
-      var message = 'MongoDB not running on the provided host and port';
+      var message = 'failed to connect to server [127.0.0.1:27050] on first' +
+        ' connect [MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27050]';
       it('maps the error message', function(done) {
         badClient.connect(function(error) {
           expect(error.message).to.equal(message);
