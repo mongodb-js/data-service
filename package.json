@@ -47,7 +47,6 @@
     "mongodb-js-errors": "^0.3.3",
     "mongodb-ns": "^2.0.0",
     "mongodb-security": "0.0.4",
-    "mongodb-stitch": "^3.0.6",
     "mongodb-url": "^3.0.1",
     "triejs": "github:rueckstiess/triejs"
   },
