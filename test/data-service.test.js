@@ -528,68 +528,6 @@ describe('DataService', function() {
     });
   });
 
-  describe('#get', function() {
-    context('when the url is /instance', function() {
-      context('when passing options', function() {
-        it('returns the instance details', function(done) {
-          service.get('/instance', {}, function(err, instance) {
-            assert.equal(null, err);
-            expect(instance.host).to.not.equal(undefined);
-            expect(instance.port).to.equal(27018);
-            expect(instance.genuineMongoDB).to.deep.equal(
-              {isGenuine: true, dbType: 'mongodb'}
-            );
-            expect(instance.dataLake).to.deep.equal(
-              {isDataLake: false, version: null}
-            );
-            done();
-          });
-        });
-      });
-
-      context('when passing no options', function() {
-        it('returns the instance details', function(done) {
-          service.get('/instance', function(err, instance) {
-            assert.equal(null, err);
-            expect(instance.host).to.not.equal(undefined);
-            expect(instance.port).to.equal(27018);
-            expect(instance.genuineMongoDB).to.deep.equal(
-              {isGenuine: true, dbType: 'mongodb'}
-            );
-            expect(instance.dataLake).to.deep.equal(
-              {isDataLake: false, version: null}
-            );
-            done();
-          });
-        });
-      });
-    });
-
-    context('when the url is /databases/:database', function() {
-      context('when passing options', function() {
-        it('returns the database details', function(done) {
-          service.get('/databases/data-service', {}, function(err, database) {
-            assert.equal(null, err);
-            expect(database._id).to.equal('data-service');
-            expect(database.stats.document_count).to.not.equal(undefined);
-            done();
-          });
-        });
-      });
-
-      context('when passing no options', function() {
-        it('returns the database details', function(done) {
-          service.get('/databases/data-service', function(err, database) {
-            assert.equal(null, err);
-            expect(database._id).to.equal('data-service');
-            expect(database.stats.document_count).to.not.equal(undefined);
-            done();
-          });
-        });
-      });
-    });
-  });
-
   describe('#instance', function() {
     it('returns the instance', function(done) {
       service.instance({}, function(err, instance) {
