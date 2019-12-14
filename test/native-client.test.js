@@ -1,3 +1,4 @@
+/* eslint indent:0 */
 var helper = require('./helper');
 var assert = helper.assert;
 var expect = helper.expect;
