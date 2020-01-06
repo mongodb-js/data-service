@@ -19,13 +19,9 @@
     "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit"
   },
-  "precommit": [
-    "check"
-  ],
   "dependencies": {
     "async": "^2.3.0",
     "debug": "^2.6.0",
-    "electron-rebuild": "^1.8.4",
     "lodash.assign": "^4.2.0",
     "lodash.assignin": "^4.2.0",
     "lodash.filter": "^4.6.0",
@@ -41,13 +37,13 @@
     "lodash.union": "^4.6.0",
     "lodash.uniqby": "^4.5.0",
     "mongodb": "^3.4.0",
-    "mongodb-collection-sample": "^4.4.3",
+    "mongodb-collection-sample": "^4.4.4",
     "mongodb-connection-model": "^14.3.7",
-    "mongodb-index-model": "^2.3.0",
-    "mongodb-js-errors": "^0.3.3",
+    "mongodb-index-model": "^2.5.0",
+    "mongodb-js-errors": "^0.4.0",
     "mongodb-ns": "^2.0.0",
     "mongodb-security": "0.0.4",
-    "mongodb-url": "^3.0.1",
+    "mongodb-url": "^3.0.2",
     "triejs": "github:rueckstiess/triejs"
   },
   "devDependencies": {
@@ -57,7 +53,6 @@
     "mocha": "^6.2.2",
     "mock-require": "^2.0.1",
     "mongodb-js-precommit": "^2.0.0",
-    "mongodb-runner": "^4.7.2",
-    "pre-commit": "^1.2.2"
+    "mongodb-runner": "^4.7.2"
   }
 }
