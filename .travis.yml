@@ -9,8 +9,6 @@ addons:
       - libkrb5-dev
       - xvfb
       - libsecret-1-dev
-      - gnome-keyring
-      - python-gnomekeyring
 node_js:
   - 12.4.0
 env:
