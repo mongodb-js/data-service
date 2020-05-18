@@ -19,9 +19,6 @@
     "posttest": "mongodb-runner stop --port 27018",
     "check": "mongodb-js-precommit"
   },
-  "peerDependencies": {
-    "electron": "*"
-  },
   "dependencies": {
     "async": "^3.2.0",
     "debug": "^4.1.1",
