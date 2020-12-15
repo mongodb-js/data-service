@@ -21,7 +21,7 @@
   },
   "peerDependencies": {
     "mongodb": "3.x",
-    "mongodb-connection-model": "18.x"
+    "mongodb-connection-model": "*"
   },
   "dependencies": {
     "async": "^3.2.0",
