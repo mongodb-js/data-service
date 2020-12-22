@@ -74,7 +74,7 @@ describe('NativeClient', function() {
         mock.stop('mongodb-connection-model');
       });
 
-      it('sets .connectionParams after successful connection', function(done) {
+      it('sets .connectionOptions after successful connection', function(done) {
         mock(
           'mongodb-connection-model',
           mockedConnectionModel()
@@ -83,10 +83,10 @@ describe('NativeClient', function() {
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
 
-        expect(mockedClient.connectionParams).to.be.null;
+        expect(mockedClient.connectionOptions).to.be.null;
 
         mockedClient.connect(function() {
-          expect(mockedClient.connectionParams).to.deep.equal({
+          expect(mockedClient.connectionOptions).to.deep.equal({
             url: 'mongodb://127.0.0.1:27018/data-service?readPreference=primary&ssl=false',
             options: {
               connectWithNoPrimary: true,
