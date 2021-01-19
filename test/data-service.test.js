@@ -763,7 +763,6 @@ describe('DataService', function() {
       expect(topology.servers.has('127.0.0.1:27018')).to.equal(true);
 
       expect(topology).to.deep.include({
-        commonWireVersion: 9,
         compatibilityError: null,
         compatible: true,
         heartbeatFrequencyMS: 10000,
