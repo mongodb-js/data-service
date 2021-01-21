@@ -8,8 +8,12 @@
     "strict": "off",
     "no-undef": "error",
     "valid-jsdoc": "off",
-    "no-prototype-builtins": "off"
+    "no-prototype-builtins": "off",
+    "mocha/no-exclusive-tests": "error"
   },
+  "plugins": [
+    "mocha"
+  ],
   "extends": [
     "eslint:recommended",
     "mongodb-js/node"
