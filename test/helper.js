@@ -3,6 +3,9 @@ var assert = require('assert');
 var expect = chai.expect;
 var Connection = require('mongodb-connection-model');
 
+var sinonChai = require('sinon-chai');
+chai.use(sinonChai);
+
 module.exports.chai = chai;
 module.exports.assert = assert;
 module.exports.expect = expect;
