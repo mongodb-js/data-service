@@ -1,5 +1,4 @@
 var sinon = require('sinon');
-const bson = require('bson');
 var helper = require('./helper');
 var assert = helper.assert;
 var expect = helper.expect;
@@ -8,7 +7,6 @@ var mock = require('mock-require');
 const EventEmitter = require('events');
 
 var NativeClient = require('../lib/native-client');
-const { spy } = require('sinon');
 
 describe('NativeClient', function() {
   this.slow(10000);

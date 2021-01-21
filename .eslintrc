@@ -9,7 +9,8 @@
     "no-undef": "error",
     "valid-jsdoc": "off",
     "no-prototype-builtins": "off",
-    "mocha/no-exclusive-tests": "error"
+    "mocha/no-exclusive-tests": "error",
+    "no-unused-vars": "error"
   },
   "plugins": [
     "mocha"
