@@ -2,7 +2,6 @@
 var helper = require('./helper');
 var assert = helper.assert;
 var expect = helper.expect;
-var eventStream = helper.eventStream;
 var ObjectId = require('bson').ObjectId;
 var mock = require('mock-require');
 const EventEmitter = require('events');
@@ -941,17 +940,9 @@ describe('NativeClient', function() {
     });
 
     context('when no filter is provided', function() {
-      it('returns a stream of sampled documents', function(done) {
-        var seen = 0;
-        client.sample('data-service.test')
-          .pipe(eventStream.through(function(doc) {
-            seen++;
-            this.emit('data', doc);
-          }, function() {
-            this.emit('end');
-            expect(seen).to.equal(2);
-            done();
-          }));
+      it('returns a cursor of sampled documents', async function() {
+        const docs = await client.sample('data-service.test').toArray();
+        expect(docs.length).to.equal(2);
       });
     });
   });

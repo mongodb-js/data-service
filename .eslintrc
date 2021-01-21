@@ -5,7 +5,16 @@
     "es6": true
   },
   "rules": {
-    "strict": 0
+    "strict": "off",
+    "no-undef": "error",
+    "valid-jsdoc": "off",
+    "no-prototype-builtins": "off"
   },
-  "extends": ["mongodb-js/node"]
+  "extends": [
+    "eslint:recommended",
+    "mongodb-js/node"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 11
+  }
 }
