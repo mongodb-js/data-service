@@ -1,4 +1,5 @@
 var sinon = require('sinon');
+const bson = require('bson');
 var helper = require('./helper');
 var assert = helper.assert;
 var expect = helper.expect;
@@ -7,6 +8,7 @@ var mock = require('mock-require');
 const EventEmitter = require('events');
 
 var NativeClient = require('../lib/native-client');
+const { spy } = require('sinon');
 
 describe('NativeClient', function() {
   this.slow(10000);
@@ -24,6 +26,12 @@ describe('NativeClient', function() {
 
   after(function(done) {
     client.disconnect(done);
+  });
+
+  const sandbox = sinon.createSandbox();
+
+  afterEach(() => {
+    sandbox.restore();
   });
 
   describe('#connect', function() {
@@ -940,12 +948,6 @@ describe('NativeClient', function() {
       });
     });
 
-    const sandbox = sinon.createSandbox();
-
-    afterEach(() => {
-      sandbox.restore();
-    });
-
     it('returns a cursor of sampled documents', async function() {
       const docs = await client.sample('data-service.test').toArray();
       expect(docs.length).to.equal(2);
@@ -972,7 +974,7 @@ describe('NativeClient', function() {
         }
       ).toArray();
 
-      expect(docs).to.deep.equal([{a: 1}, {a: 2}]);
+      expect(docs).to.deep.include.members([{a: 1}, {a: 2}]);
     });
 
     it('allows to set a sample size', async function() {
@@ -1026,6 +1028,37 @@ describe('NativeClient', function() {
     });
   });
 
+  describe('startSession', () => {
+    it('returns a new client session', () => {
+      const session = client.startSession();
+      expect(session.constructor.name).to.equal('ClientSession');
+
+      // used by killSession, must be a bson UUID in order to work
+      expect(session.id.id._bsontype).to.equal('Binary');
+      expect(session.id.id.sub_type).to.equal(4);
+    });
+  });
+
+  describe('killSession', () => {
+    it('does not throw if kill a non existing session', async() => {
+      const session = client.startSession();
+      await client.killSession(session);
+    });
+
+    it('kills a command with a session', () => {
+      const commandSpy = sinon.spy();
+      sandbox.replace(client.database, 'admin', () => ({
+        command: commandSpy
+      }));
+
+      const session = client.startSession();
+      client.killSession(session);
+
+      expect(commandSpy.args[0][0]).to.deep.equal({
+        killSessions: [ session.id ]
+      });
+    });
+  });
 
   /**
    * @see https://jira.mongodb.org/browse/INT-1294
