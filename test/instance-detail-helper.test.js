@@ -4,60 +4,72 @@ const connect = Connection.connect;
 const { getInstance } = require('../lib/instance-detail-helper');
 const helper = require('./helper');
 const DataService = require('../lib/data-service');
+const { promisify } = require('util');
 const _ = require('lodash');
 
 describe('mongodb-data-service#instance', function() {
   describe('local', function() {
     let client;
-    let db;
-    after(function(done) {
-      client.close(true, done);
-    });
-    it('should connect to `localhost:27018`', function(done) {
-      Connection.from(
-        'mongodb://localhost:27018/data-service',
-        function(error, model) {
-          assert.equal(error, null);
-          connect(
-            model,
-            null,
-            function(err, _client) {
-              if (err) {
-                return done(err);
-              }
-              client = _client;
-              db = client.db('data-service');
-              done();
-            }
-          );
-        }
+    let model;
+
+    before(async() => {
+      model = await Connection.from(
+        'mongodb://localhost:27018/data-service'
       );
     });
-    it('should not close the db after getting instance details', function(done) {
-      assert(db);
-      getInstance(client, db, function(err) {
-        if (err) {
-          return done(err);
-        }
-        db.admin().ping(function(_err, pingResult) {
-          if (_err) {
-            done(_err);
+
+    describe('connecting', () => {
+      after(function(done) {
+        client.close(true, done);
+      });
+      it('should connect to `localhost:27018`', async() => {
+        const [ _client ] = await connect(
+          model,
+          null
+        );
+        client = _client;
+      });
+    });
+
+    describe('after connecting', () => {
+      before(async() => {
+        const [ _client ] = await connect(
+          model,
+          null
+        );
+        client = _client;
+      });
+      after(function(done) {
+        client.close(true, done);
+      });
+
+      it('should not close the db after getting instance details', (done) => {
+        const db = client.db('data-service');
+
+        assert(db);
+        getInstance(client, db, function(err) {
+          if (err) {
+            return done(err);
           }
-          done(null, pingResult);
+          db.admin().ping(function(_err, pingResult) {
+            if (_err) {
+              done(_err);
+            }
+            done(null, pingResult);
+          });
         });
       });
     });
+
     if (process.env.MONGODB_TOPOLOGY !== 'cluster') {
       describe('views', function() {
-        var service = new DataService(helper.connection);
-        var instanceDetails = null;
-        before(function(done) {
-          service.connect(function(err) {
-            if (err) return done(err);
-            helper.insertTestDocuments(service.client, function() {
-              done();
-            });
-          });
+        const service = new DataService(helper.connection);
+        let instanceDetails;
+        before(async() => {
+          await service.connect();
+
+          const runInsertDocuments = promisify(helper.insertTestDocuments);
+          await runInsertDocuments(service.client);
         });
 
         after(function(done) {
