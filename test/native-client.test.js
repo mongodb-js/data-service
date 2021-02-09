@@ -1,25 +1,23 @@
-var sinon = require('sinon');
-var helper = require('./helper');
-var assert = helper.assert;
-var expect = helper.expect;
-var ObjectId = require('bson').ObjectId;
-var mock = require('mock-require');
+const sinon = require('sinon');
+const helper = require('./helper');
+const assert = helper.assert;
+const expect = helper.expect;
+const ObjectId = require('bson').ObjectId;
+const mock = require('mock-require');
 const EventEmitter = require('events');
 
-var NativeClient = require('../lib/native-client');
+const NativeClient = require('../lib/native-client');
 
 describe('NativeClient', function() {
   this.slow(10000);
   this.timeout(20000);
-  var client = new NativeClient(helper.connection);
+  const client = new NativeClient(helper.connection);
 
-  before(function(done) {
-    const callback = (err, result) => {
-      const adminDb = client.database.admin();
-      adminDb.addUser('dba-admin', 'password', { roles: ['root'] });
-      done(err, result);
-    };
-    client.connect(callback);
+  before(async() => {
+    await client.connect();
+
+    const adminDb = client.database.admin();
+    adminDb.addUser('dba-admin', 'password', { roles: ['root'] });
   });
 
   after(function(done) {
@@ -64,14 +62,18 @@ describe('NativeClient', function() {
         };
 
         return {
-          connect(_model, setupListeners, cb) {
+          async connect(_model, setupListeners) {
             const mockedClient = new EventEmitter();
             mockedClient.db = () => {};
             setupListeners(mockedClient);
             mockedClient.emit('topologyDescriptionChanged', {
               newDescription: _topologyDescription
             });
-            cb(null, mockedClient, _connectionOptions);
+
+            return [
+              mockedClient,
+              _connectionOptions
+            ];
           }
         };
       }
@@ -80,59 +82,54 @@ describe('NativeClient', function() {
         mock.stop('mongodb-connection-model');
       });
 
-      it('sets .connectionOptions after successful connection', function(done) {
+      it('sets .connectionOptions after successful connection', async() => {
         mock(
           'mongodb-connection-model',
           mockedConnectionModel()
         );
 
-        var MockedNativeClient = mock.reRequire('../lib/native-client');
-        var mockedClient = new MockedNativeClient(helper.connection);
+        const MockedNativeClient = mock.reRequire('../lib/native-client');
+        const mockedClient = new MockedNativeClient(helper.connection);
 
         expect(mockedClient.connectionOptions).to.be.null;
 
-        mockedClient.connect(function() {
-          expect(mockedClient.connectionOptions).to.deep.equal({
-            url: 'mongodb://127.0.0.1:27018/data-service?readPreference=primary&ssl=false',
-            options: {
-              connectWithNoPrimary: true,
-              readPreference: 'primary',
-              useNewUrlParser: true,
-              useUnifiedTopology: true
-            }
-          });
-          done();
+        await mockedClient.connect();
+
+        expect(mockedClient.connectionOptions).to.deep.equal({
+          url: 'mongodb://127.0.0.1:27018/data-service?readPreference=primary&ssl=false',
+          options: {
+            connectWithNoPrimary: true,
+            readPreference: 'primary',
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+          }
         });
       });
 
-      it('sets .isMongos to true when topology is sharded', function(done) {
+      it('sets .isMongos to true when topology is sharded', async() => {
         mock(
           'mongodb-connection-model',
           mockedConnectionModel(mockedTopologyDescription('Sharded'))
         );
 
-        var MockedNativeClient = mock.reRequire('../lib/native-client');
-        var mockedClient = new MockedNativeClient(helper.connection);
+        const MockedNativeClient = mock.reRequire('../lib/native-client');
+        const mockedClient = new MockedNativeClient(helper.connection);
 
-        mockedClient.connect(function() {
-          expect(mockedClient.isMongos).to.be.true;
-          done();
-        });
+        await mockedClient.connect();
+        expect(mockedClient.isMongos).to.be.true;
       });
 
-      it('sets .isMongos to false when topology is not sharded', function(done) {
+      it('sets .isMongos to false when topology is not sharded', async() => {
         mock('mongodb-connection-model', mockedConnectionModel());
 
-        var MockedNativeClient = mock.reRequire('../lib/native-client');
-        var mockedClient = new MockedNativeClient(helper.connection);
+        const MockedNativeClient = mock.reRequire('../lib/native-client');
+        const mockedClient = new MockedNativeClient(helper.connection);
 
-        mockedClient.connect(function() {
-          expect(mockedClient.isMongos).to.be.false;
-          done();
-        });
+        await mockedClient.connect();
+        expect(mockedClient.isMongos).to.be.false;
       });
 
-      it('sets .isWritable to true when the node is a primary replset member', function(done) {
+      it('sets .isWritable to true when the node is a primary replset member', async() => {
         mock(
           'mongodb-connection-model',
           mockedConnectionModel(
@@ -143,13 +140,11 @@ describe('NativeClient', function() {
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
 
-        mockedClient.connect(function() {
-          expect(mockedClient.isWritable).to.be.true;
-          done();
-        });
+        await mockedClient.connect();
+        expect(mockedClient.isWritable).to.be.true;
       });
 
-      it('sets .isWritable to false when the node is a secondary replset member', function(done) {
+      it('sets .isWritable to false when the node is a secondary replset member', async() => {
         mock(
           'mongodb-connection-model',
           mockedConnectionModel(
@@ -160,13 +155,11 @@ describe('NativeClient', function() {
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
 
-        mockedClient.connect(function() {
-          expect(mockedClient.isWritable).to.be.false;
-          done();
-        });
+        await mockedClient.connect();
+        expect(mockedClient.isWritable).to.be.false;
       });
 
-      it('sets .isWritable to true when the node is a mongos', function(done) {
+      it('sets .isWritable to true when the node is a mongos', async() => {
         mock(
           'mongodb-connection-model',
           mockedConnectionModel(mockedTopologyDescription('Single', 'Mongos'))
@@ -175,10 +168,8 @@ describe('NativeClient', function() {
         var MockedNativeClient = mock.reRequire('../lib/native-client');
         var mockedClient = new MockedNativeClient(helper.connection);
 
-        mockedClient.connect(function() {
-          expect(mockedClient.isWritable).to.be.true;
-          done();
-        });
+        await mockedClient.connect();
+        expect(mockedClient.isWritable).to.be.true;
       });
     });
   });
@@ -554,10 +545,6 @@ describe('NativeClient', function() {
           done();
         });
       });
-    });
-
-    context('when the user is not authorized', function() {
-      it('passes an error to the callback');
     });
   });
 

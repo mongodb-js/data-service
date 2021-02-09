@@ -10,8 +10,8 @@ describe('DataService', function() {
   this.timeout(20000);
   const service = new DataService(helper.connection);
 
-  before(function(done) {
-    service.connect(done);
+  before(async() => {
+    await service.connect();
   });
   after(function(done) {
     service.disconnect(done);
