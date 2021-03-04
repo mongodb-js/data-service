@@ -71,7 +71,7 @@ describe('NativeClient', function() {
             mockedClient.emit('topologyDescriptionChanged', {
               newDescription: _topologyDescription
             });
-            cb(null, mockedClient, _connectionOptions);
+            cb(null, mockedClient, null, _connectionOptions);
           }
         };
       }
