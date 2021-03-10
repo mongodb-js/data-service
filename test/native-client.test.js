@@ -8,6 +8,58 @@ const EventEmitter = require('events');
 
 var NativeClient = require('../lib/native-client');
 
+function mockedTopologyDescription(
+  topologyType = 'Standalone',
+  serverType = 'Single'
+) {
+  return {
+    type: topologyType,
+    servers: new Map([['127.0.0.1:27017', { type: serverType }]])
+  };
+}
+
+/*
+ * pretends to be a connection-model providing every function call
+ * required in NativeClient#connect, but returns topology and connection
+ * params of our choice
+ */
+function mockedConnectionModel(topologyDescription, connectionOptions) {
+  const _topologyDescription =
+    topologyDescription || mockedTopologyDescription();
+
+  const _connectionOptions = connectionOptions || {
+    url:
+      'mongodb://127.0.0.1:27018/data-service?readPreference=primary&ssl=false',
+    options: {
+      connectWithNoPrimary: true,
+      readPreference: 'primary',
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    }
+  };
+
+  const mockedTunnel = {
+    close() {
+      return Promise.resolve();
+    }
+  };
+
+  return {
+    connect(_model, setupListeners, cb) {
+      const mockedClient = new EventEmitter();
+      mockedClient.db = () => {};
+      mockedClient.close = (_force, closeCb) => {
+        closeCb();
+      };
+      setupListeners(mockedClient);
+      mockedClient.emit('topologyDescriptionChanged', {
+        newDescription: _topologyDescription
+      });
+      cb(null, mockedClient, mockedTunnel, _connectionOptions);
+    }
+  };
+}
+
 describe('NativeClient', function() {
   this.slow(10000);
   this.timeout(20000);
@@ -34,54 +86,6 @@ describe('NativeClient', function() {
 
   describe('#connect', function() {
     context('when mocking connection-model', function() {
-      function mockedTopologyDescription(
-        topologyType = 'Standalone',
-        serverType = 'Single'
-      ) {
-        return {
-          type: topologyType,
-          servers: new Map([['127.0.0.1:27017', { type: serverType }]])
-        };
-      }
-
-      /*
-       * pretends to be a connection-model providing every function call
-       * required in NativeClient#connect, but returns topology and connection
-       * params of our choice
-       */
-      function mockedConnectionModel(topologyDescription, connectionOptions) {
-        const _topologyDescription =
-          topologyDescription || mockedTopologyDescription();
-
-        const _connectionOptions = connectionOptions || {
-          url: 'mongodb://127.0.0.1:27018/data-service?readPreference=primary&ssl=false',
-          options: {
-            connectWithNoPrimary: true,
-            readPreference: 'primary',
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-          }
-        };
-
-        const mockedTunnel = {
-          close() {
-            return Promise.resolve();
-          }
-        };
-
-        return {
-          connect(_model, setupListeners, cb) {
-            const mockedClient = new EventEmitter();
-            mockedClient.db = () => {};
-            setupListeners(mockedClient);
-            mockedClient.emit('topologyDescriptionChanged', {
-              newDescription: _topologyDescription
-            });
-            cb(null, mockedClient, mockedTunnel, _connectionOptions);
-          }
-        };
-      }
-
       after(function() {
         mock.stop('mongodb-connection-model');
       });
@@ -206,6 +210,40 @@ describe('NativeClient', function() {
         mockedClient.connect(function() {
           expect(mockedClient.isWritable).to.be.true;
           done();
+        });
+      });
+    });
+  });
+
+  describe('#disconnect', () => {
+    context('when mocking connection-model', () => {
+      after(() => {
+        mock.stop('mongodb-connection-model');
+      });
+
+      it('should close tunnel before calling disconnect callback', (done) => {
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel()
+        );
+
+        const MockedNativeClient = mock.reRequire('../lib/native-client');
+        const mockedClient = new MockedNativeClient(helper.connection);
+
+        mockedClient.connect(() => {
+          const closeSpy = sandbox.spy(mockedClient.tunnel, 'close');
+
+          const disconnectCallbackSpy = sandbox.spy(() => {
+            try {
+              expect(closeSpy).to.have.been.calledOnce;
+              expect(closeSpy).to.have.been.calledBefore(disconnectCallbackSpy);
+              done();
+            } catch (err) {
+              done(err);
+            }
+          });
+
+          mockedClient.disconnect(disconnectCallbackSpy);
         });
       });
     });
