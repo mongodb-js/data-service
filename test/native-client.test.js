@@ -63,6 +63,12 @@ describe('NativeClient', function() {
           }
         };
 
+        const mockedTunnel = {
+          close() {
+            return Promise.resolve();
+          }
+        };
+
         return {
           connect(_model, setupListeners, cb) {
             const mockedClient = new EventEmitter();
@@ -71,13 +77,35 @@ describe('NativeClient', function() {
             mockedClient.emit('topologyDescriptionChanged', {
               newDescription: _topologyDescription
             });
-            cb(null, mockedClient, null, _connectionOptions);
+            cb(null, mockedClient, mockedTunnel, _connectionOptions);
           }
         };
       }
 
       after(function() {
         mock.stop('mongodb-connection-model');
+      });
+
+      it('does not allow to connect twice without disonnecting first', (done) => {
+        mock(
+          'mongodb-connection-model',
+          mockedConnectionModel()
+        );
+
+        const MockedNativeClient = mock.reRequire('../lib/native-client');
+        const mockedClient = new MockedNativeClient(helper.connection);
+
+        mockedClient.connect(() => {});
+        mockedClient.connect(err => {
+          expect(err).to.be.instanceOf(Error);
+          expect(err)
+            .to.have.property('message')
+            .match(
+              /Connect method has been called more than once without disconnecting/
+            );
+
+          done();
+        });
       });
 
       it('sets .connectionOptions after successful connection', function(done) {
