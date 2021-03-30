@@ -17,6 +17,12 @@ describe('DataService', function() {
     service.disconnect(done);
   });
 
+  describe('#isConnected', () => {
+    it('returns true if client is connected', () => {
+      expect(service.isConnected()).to.equal(true);
+    });
+  });
+
   describe('#deleteOne', function() {
     it('deletes the document from the collection', function(done) {
       service.insertOne(
