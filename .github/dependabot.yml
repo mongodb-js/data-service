@@ -1,0 +1,42 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "08:00"
+    timezone: Australia/Sydney
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: eslint
+    versions:
+    - 7.19.0
+    - 7.20.0
+    - 7.21.0
+    - 7.22.0
+    - 7.23.0
+    - 7.24.0
+  - dependency-name: mongodb
+    versions:
+    - 3.6.4
+    - 3.6.5
+  - dependency-name: bson
+    versions:
+    - 4.2.3
+  - dependency-name: mocha
+    versions:
+    - 8.3.0
+    - 8.3.1
+  - dependency-name: mongodb-connection-model
+    versions:
+    - 19.0.2
+    - 19.0.3
+    - 19.1.0
+  - dependency-name: chai
+    versions:
+    - 4.3.0
+    - 4.3.1
+    - 4.3.3
+  - dependency-name: mongodb-runner
+    versions:
+    - 4.8.1
